@@ -74,41 +74,41 @@ function enable() {
        // do nothing
     });
     
-	// How to cancel hover behaviour?
+    // How to cancel hover behaviour?
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
         let title = this.title;
-		// Always show titles
+        // Always show titles
         title.show();
             
-		// -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
-		// This is work, maybe means 'Get the positions of each Window?'
-		let [cloneX, cloneY, cloneWidth, cloneHeight] = this._windowClone.slot;
-		// -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
+        // -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
+        // This is work, maybe means 'Get the positions of each Window?'
+        let [cloneX, cloneY, cloneWidth, cloneHeight] = this._windowClone.slot;
+        // -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
 
-		// -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
-		let titleWidth = title.width;
-		log('titleWidth is ' + titleWidth);
-		//I need this to be able to know it's preferred size
-		title.set_size(-1, -1);
-		let [titleMinWidth, titleNatWidth] = title.get_preferred_width(-1);
-		//I need this so that the animation go smooth
-		title.width = titleWidth;
+        // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
+        let titleWidth = title.width;
+        log('titleWidth is ' + titleWidth);
+        //I need this to be able to know it's preferred size
+        title.set_size(-1, -1);
+        let [titleMinWidth, titleNatWidth] = title.get_preferred_width(-1);
+        //I need this so that the animation go smooth
+        title.width = titleWidth;
 
-		if (showTitleFullName){
-		    titleWidth = titleNatWidth;
-		}else{
-		    titleWidth = Math.max(titleMinWidth, Math.min(titleNatWidth, cloneWidth));
-		}
+        if (showTitleFullName){
+            titleWidth = titleNatWidth;
+        }else{
+            titleWidth = Math.max(titleMinWidth, Math.min(titleNatWidth, cloneWidth));
+        }
 
-		let titleX = Math.round(cloneX + (cloneWidth - titleWidth) / 2);
-		log('titleX is ' + titleX);
-		Tweener.addTween(title,{
-			x: titleX,
-			width: titleWidth,
-			time: 0.1,
-			transition: 'easeOutQuad',
-		});
-		// -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
+        let titleX = Math.round(cloneX + (cloneWidth - titleWidth) / 2);
+        log('titleX is ' + titleX);
+        Tweener.addTween(title,{
+            x: titleX,
+            width: titleWidth,
+            time: 0.1,
+            transition: 'easeOutQuad',
+        });
+        // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
     });
 }
 
