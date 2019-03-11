@@ -12,7 +12,6 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const Workspace = imports.ui.workspace;
-const St = imports.gi.St;
 const Tweener = imports.ui.tweener;
 
 let windowOverlayInjections;
@@ -43,6 +42,24 @@ function injectToFunction(objectPrototype, functionName, injectedFunction) {
     return originalFunction;
 }
 
+// override original functions
+function overrideFunction(objectPrototype, functionName, injectedFunction) {
+    let originalFunction = objectPrototype[functionName];
+
+    objectPrototype[functionName] = function() {
+        let returnValue;
+
+        let injectedReturnValue = injectedFunction.apply(this, arguments);
+        if (returnValue === undefined) {
+            returnValue = injectedReturnValue;
+        }
+
+        return returnValue;
+    }
+
+    return originalFunction;
+}
+
 function removeInjection(objectPrototype, injection, functionName) {
     if (injection[functionName] === undefined) {
         delete objectPrototype[functionName];
@@ -53,41 +70,34 @@ function removeInjection(objectPrototype, injection, functionName) {
 
 function enable() {
     resetState();
-    
-    windowOverlayInjections['_init'] = injectToFunction(Workspace.WindowOverlay.prototype, '_init', function(windowClone, parentActor) {
-        // do nothing
-    });
-    
-    windowOverlayInjections['hide'] = injectToFunction(Workspace.WindowOverlay.prototype, 'hide', function() {
-        // do nothing
-    });
-    
-    windowOverlayInjections['show'] = injectToFunction(Workspace.WindowOverlay.prototype, 'show', function() {
-        // do nothing
-    });
-    
-    windowOverlayInjections['_onShowChrome'] = injectToFunction(Workspace.WindowOverlay.prototype, '_onShowChrome', function() {
-        // do nothing
+
+    // Disable hover behaviour
+    windowOverlayInjections['show'] = overrideFunction(Workspace.WindowOverlay.prototype, 'show', function() {
+        this._hidden = true;
     });
 
-    windowOverlayInjections['_onHideChrome'] = injectToFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
-       // do nothing
+    // Disable hover behaviour
+    windowOverlayInjections['_animateInvisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateInvisible', function () {
+        [this.closeButton, this.border, this.title].forEach(a => {
+            a.opacity = 0;
+            Tweener.addTween(a,
+                { opacity: 255,
+                    transition: 'easeInQuad' });
+        });
     });
-    
-    // How to cancel hover behaviour?
+
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
         let title = this.title;
         // Always show titles
         title.show();
             
         // -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
-        // This is work, maybe means 'Get the positions of each Window?'
+        // It works! Maybe 'this._windowClone.slot' means 'Get the positions of each Window?'
         let [cloneX, cloneY, cloneWidth, cloneHeight] = this._windowClone.slot;
         // -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
 
         // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
         let titleWidth = title.width;
-        log('titleWidth is ' + titleWidth);
         //I need this to be able to know it's preferred size
         title.set_size(-1, -1);
         let [titleMinWidth, titleNatWidth] = title.get_preferred_width(-1);
@@ -101,7 +111,6 @@ function enable() {
         }
 
         let titleX = Math.round(cloneX + (cloneWidth - titleWidth) / 2);
-        log('titleX is ' + titleX);
         Tweener.addTween(title,{
             x: titleX,
             width: titleWidth,
