@@ -86,7 +86,15 @@ function enable() {
         });
     });
 
+    windowOverlayInjections['_animateVisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
+        
+    });
+
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
+        // Always show close button
+        if (this._windowCanClose())
+            this.closeButton.show();
+
         let title = this.title;
         // Always show titles
         title.show();
