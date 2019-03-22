@@ -71,23 +71,34 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
-    // Disable hover behaviour
-    windowOverlayInjections['show'] = overrideFunction(Workspace.WindowOverlay.prototype, 'show', function() {
-        this._hidden = true;
+    windowOverlayInjections['_onShowChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onShowChrome', function() {
+        this._animateVisible();
+        this.emit('chrome-visible');
     });
 
-    // Disable hover behaviour
     windowOverlayInjections['_animateInvisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateInvisible', function () {
-        [this.closeButton, this.border, this.title].forEach(a => {
-            a.opacity = 0;
+        // hide border
+        [this.border].forEach(a => {
+            a.opacity = 255;
             Tweener.addTween(a,
-                { opacity: 255,
+                { opacity: 0,
+                    time: 0.1,
                     transition: 'easeInQuad' });
         });
     });
 
+    // show border
     windowOverlayInjections['_animateVisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
-        
+        this._parentActor.raise_top();
+
+        [this.border].forEach(a => {
+            a.show();
+            a.opacity = 0;
+            Tweener.addTween(a,
+                { opacity: 255,
+                    time: 0.1,
+                    transition: 'easeOutQuad' });
+        });
     });
 
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
@@ -98,7 +109,7 @@ function enable() {
         let title = this.title;
         // Always show titles
         title.show();
-            
+
         // -- Code comes from https://extensions.gnome.org/extension/1378/overview-titles-shrink/ --+
         // It works! Maybe 'this._windowClone.slot' means 'Get the positions of each Window?'
         let [cloneX, cloneY, cloneWidth, cloneHeight] = this._windowClone.slot;
@@ -133,7 +144,7 @@ function disable() {
     for (let functionName in windowOverlayInjections) {
         removeInjection(Workspace.WindowOverlay.prototype, windowOverlayInjections, functionName);
     }
-    
+
     resetState();
 }
 
@@ -146,4 +157,4 @@ function init() {
 function main() {
     init();
     enable();
-} 
+}
