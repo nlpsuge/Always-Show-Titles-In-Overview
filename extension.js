@@ -75,6 +75,11 @@ function enable() {
         this._animateVisible();
         this.emit('chrome-visible');
     });
+    
+    // Hide border immediately
+    windowOverlayInjections['_onHideChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
+        this.border.hide();
+    });
 
     windowOverlayInjections['_animateInvisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateInvisible', function () {
         // hide border
