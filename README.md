@@ -8,4 +8,5 @@ Please read this post([Gnome 3.26: How to get the window titles in the activitie
 and this comment below a bug report([Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953)).
 
 # TODO
-Remove the fade time when leave a window.
+- [x] Remove the fade time when leave a window
+- [ ] Find a way to distinguish the selected window and the others. 1.Maybe I can find a way to increase the light of the highlight around the selected window. 2.Or I can find a way to reverse the color of the title and it's background of the highlight around the selected window.
