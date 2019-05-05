@@ -10,5 +10,5 @@ and this comment below a bug report([Window picker layout improvements](https://
 # TODO
 - [x] Remove the fade time when leave a window
 - [ ] Find a way to distinguish the selected window and the others. 1.Maybe I can find a way to increase the light of the highlight around the selected window. 2.Or I can find a way to reverse the color of the title and it's background of the highlight around the selected window.
-- [ ] Be compatible with GNOME Shell v3.32
+- [x] Be compatible with GNOME Shell v3.32
 - [ ] Wine-based application's window has no close button. Remove 'if (this._windowCanClose())' can fix this issue, but I don't know if it's a good idea.
