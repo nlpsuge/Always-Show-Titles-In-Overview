@@ -71,39 +71,24 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
-    windowOverlayInjections['_onShowChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onShowChrome', function() {
-        this._animateVisible();
-        this.emit('chrome-visible');
-    });
-    
     // Hide border immediately
     windowOverlayInjections['_onHideChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
         this.border.hide();
     });
 
-    windowOverlayInjections['_animateInvisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateInvisible', function () {
-        // hide border
-        [this.border].forEach(a => {
-            a.opacity = 255;
-            Tweener.addTween(a,
-                { opacity: 0,
-                    time: 0.1,
-                    transition: 'easeInQuad' });
-        });
+    windowOverlayInjections['_animateVisible'] = injectToFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
+        // reset opacity to 255 of title and close button to prevent them to flutter
+        Tweener.removeTweens(this.title);
+        this.title.opacity = 255;
+        Tweener.removeTweens(this.closeButton);
+        this.closeButton.opacity = 255;
     });
 
-    // show border
-    windowOverlayInjections['_animateVisible'] = overrideFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
-        this._parentActor.raise_top();
-
-        [this.border].forEach(a => {
-            a.show();
-            a.opacity = 0;
-            Tweener.addTween(a,
-                { opacity: 255,
-                    time: 0.1,
-                    transition: 'easeOutQuad' });
-        });
+    windowOverlayInjections['hideOverlay'] = injectToFunction(Workspace.WindowOverlay.prototype, 'hideOverlay', function() {
+        this.border.hide();
+        if (this._windowCanClose())
+            this.closeButton.show();
+        this.title.show();
     });
 
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
