@@ -3,9 +3,10 @@
   "description": "Always Show Titles In Overview can help to show titles of all windows in the Gnome 3 overview.",
   "name": "Always Show Titles In Overview",
   "shell-version": [
-    "3.30.2"
+    "3.30.2",
+    "3.32"
   ],
   "url": "https://github.com/nlpsuge/Always-Show-Titles-In-Overview",
   "uuid": "Always-Show-Titles-In-Overview@gmail.com",
-  "version": 3
+  "version": 4
 }
