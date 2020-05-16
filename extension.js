@@ -74,9 +74,16 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
-    // Hide border immediately
+    // Hide border immediately when going to other thumbnails in Overview
     windowOverlayInjections['_onHideChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
         this.border.hide();
+    });
+
+    // Hide close button, border, title immediately when leaving Overview
+    windowOverlayInjections['hide'] = injectToFunction(Workspace.WindowOverlay.prototype, 'hide', function () {
+        this.closeButton.hide();
+        this.border.hide();
+        this.title.hide();
     });
 
     windowOverlayInjections['_animateVisible'] = injectToFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
