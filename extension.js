@@ -13,9 +13,12 @@
 
 const Workspace = imports.ui.workspace;
 const Tweener = imports.ui.tweener;
+const { Clutter } = imports.gi;
 
 let windowOverlayInjections;
-let showTitleFullName = false;
+
+var SHOW_TITLE_FULLNAME = false;
+var TITLE_APPEARANCE_DURATION = 0.1
 
 function resetState() {
     windowOverlayInjections = {};
@@ -92,6 +95,7 @@ function enable() {
     });
 
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
+
         // Always show close button
         if (this._windowCanClose())
             this.closeButton.show();
@@ -107,25 +111,32 @@ function enable() {
 
         // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
         let titleWidth = title.width;
-        //I need this to be able to know it's preferred size
+
+        // Clutter.Actor.get_preferred_width() will return the fixed width if
+        // one is set, so we need to reset the width by calling set_width(-1),
+        // to forward the call down to StLabel.
+        // We also need to save and restore the current width, otherwise the
+        // animation starts from the wrong point.
         title.set_size(-1, -1);
         let [titleMinWidth, titleNatWidth] = title.get_preferred_width(-1);
+
         //I need this so that the animation go smooth
         title.width = titleWidth;
 
-        if (showTitleFullName){
+        if (SHOW_TITLE_FULLNAME){
             titleWidth = titleNatWidth;
         }else{
-            titleWidth = Math.max(titleMinWidth, Math.min(titleNatWidth, cloneWidth));
+            titleWidth = Math.max(titleMinWidth, Math.min(titleNatWidth, this._maxTitleWidth, cloneWidth, this.border.width));
         }
 
         let titleX = Math.round(cloneX + (cloneWidth - titleWidth) / 2);
-        Tweener.addTween(title,{
+        title.ease({
             x: titleX,
             width: titleWidth,
-            time: 0.1,
-            transition: 'easeOutQuad',
-        });
+            opacity: 255,
+            duration: TITLE_APPEARANCE_DURATION,
+            mode: Clutter.AnimationMode.EASE_IN_QUAD,
+        })
         // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
     });
 }
