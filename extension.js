@@ -75,7 +75,7 @@ function enable() {
     resetState();
 
     // Hide border immediately when going to other thumbnails in Overview
-    windowOverlayInjections['_onHideChrome'] = overrideFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
+    windowOverlayInjections['_onHideChrome'] = injectToFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
         this.border.hide();
     });
 
