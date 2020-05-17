@@ -18,7 +18,7 @@ const { Clutter } = imports.gi;
 let windowOverlayInjections;
 
 var SHOW_TITLE_FULLNAME = false;
-var TITLE_APPEARANCE_DURATION = 0.1
+var DEFAULT_DURATION = 0.1
 
 function resetState() {
     windowOverlayInjections = {};
@@ -86,6 +86,18 @@ function enable() {
         this.title.hide();
     });
 
+    // Do not hide close button, title any more
+    windowOverlayInjections['_animateInvisible'] = injectToFunction(Workspace.WindowOverlay.prototype, '_animateInvisible', function () {
+        [this.closeButton, this.title].forEach(a => {
+            a.opacity = 0;
+            a.ease({
+                opacity: 255,
+                duration: DEFAULT_DURATION,
+                mode: Clutter.AnimationMode.EASE_IN_QUAD,
+            });
+        });
+    });
+
     windowOverlayInjections['_animateVisible'] = injectToFunction(Workspace.WindowOverlay.prototype, '_animateVisible', function () {
         // reset opacity to 255 of title and close button to prevent them to flutter
         Tweener.removeTweens(this.title);
@@ -141,7 +153,7 @@ function enable() {
             x: titleX,
             width: titleWidth,
             opacity: 255,
-            duration: TITLE_APPEARANCE_DURATION,
+            duration: DEFAULT_DURATION,
             mode: Clutter.AnimationMode.EASE_IN_QUAD,
         })
         // -- Code comes from https://extensions.gnome.org/extension/529/windows-overview-tooltips/ --+
