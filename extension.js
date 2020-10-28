@@ -74,6 +74,11 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
+    // Workspace.LayoutStrategy
+    // windowOverlayInjections['_onHideChrome'] = injectToFunction(Workspace.Workspace.prototype, '_onHideChrome', function() {
+    //     this.border.hide();
+    // });
+
     // Hide border immediately when going to other thumbnails in Overview
     windowOverlayInjections['_onHideChrome'] = injectToFunction(Workspace.WindowOverlay.prototype, '_onHideChrome', function() {
         this.border.hide();
@@ -104,6 +109,77 @@ function enable() {
         this.title.opacity = 255;
         Tweener.removeTweens(this.closeButton);
         this.closeButton.opacity = 255;
+
+        let [cloneX, cloneY, cloneWidth, cloneHeight] = this._windowClone.slot;
+
+        print("let [cloneX = " + cloneX + " , cloneY = " + cloneY + " , cloneWidth " + cloneWidth + " , cloneHeight + " + cloneHeight + "] = this._windowClone.slot ")
+
+        // let [x, y, scale, clone] = this._windowClone.slot;
+        // print("let [y = " + x + " , y = " + y + " , scale " + scale + " , clone + " + clone + "] = this._windowClone.slot ")
+
+        // let layout = this._currentLayout;
+        // let strategy = layout.strategy;
+        // let [, , padding] = this._getSpacingAndPadding();
+        // let area = padArea(this._actualGeometry, padding);
+        // let slots = strategy.computeWindowSlots(layout, area);
+        // for (let i = 0; i < slots.length; i++) {
+        //     let slot = slots[i];
+        //     let [x, y, scale, clone] = slot;
+        //     print("The clone is " + clone + " . x = " + x + " y = " + y + ", scale = " + scale)
+        // }
+
+        let windowClone = this._windowClone;
+        let rect = windowClone.metaWindow.get_frame_rect();
+
+        print("rect.scale_x " + windowClone.scale_x)
+        print("rect.scale_y " + windowClone.scale_y)
+
+        let new_scale = 0.5
+
+        // let params = {
+        //     x: rect.x * 0.2,
+        //     y: rect.y * 0.2,
+        //     width: rect.width * 0.2,
+        //     height: rect.height * 0.2,
+        //     duration: 1,
+        //     mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        // };
+        let params = {
+            // scale_x: 0.8,
+            // scale_y: 0.8,
+            // scale_x: windowClone.scale_x+0.1,
+            // scale_y: windowClone.scale_y+0.1,
+            // x: rect.x,
+            // y: rect.y,
+            width: cloneWidth * new_scale,
+            height: cloneHeight * new_scale,
+            duration: 1,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        };
+        // windowClone.ease(params);
+
+        this._windowClone.slot = [cloneX, cloneY, cloneWidth * new_scale, cloneHeight * new_scale];
+        this._windowClone.positioned = true;
+
+        // this._windowClone.set_translation(x, y, 0);
+        this._windowClone.set_scale(new_scale, new_scale);
+
+        print("rect.scale_x 1 = " + this._windowClone.scale_x)
+        print("rect.scale_y 1 = " + this._windowClone.scale_y)
+        // this.relayout(true)
+
+        windowClone.overlay.relayout(false);
+        //
+        // windowClone.ease({
+        //     scale_x: scale,
+        //     scale_y: scale,
+        //     duration: 1,
+        //     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        //     onComplete: () => {
+        //         this._showWindowOverlay(windowClone, overlay);
+        //     },
+        // });
+
     });
 
     windowOverlayInjections['hideOverlay'] = injectToFunction(Workspace.WindowOverlay.prototype, 'hideOverlay', function() {
@@ -114,6 +190,7 @@ function enable() {
     });
 
     windowOverlayInjections['relayout'] = injectToFunction(Workspace.WindowOverlay.prototype, 'relayout', function(animate) {
+        print("relayouting " + this.title.toString())
 
         // Always show close button
         if (this._windowCanClose())
