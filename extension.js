@@ -74,8 +74,22 @@ function enable() {
     resetState();
 
     windowOverlayInjections['hideOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', function(animate) {
-        // Do nothing
+        const toShow = this._windowCanClose()
+            ? [this._border, this._title, this._closeButton]
+            : [this._border, this._title];
+
+        toShow.forEach(a => {
+            a.opacity = 0;
+            a.show();
+            a.ease({
+                opacity: 255,
+                duration: 0,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            });
+        });
     });
+
+
 }
 
 function disable() {
