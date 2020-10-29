@@ -73,6 +73,37 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
+    windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
+        if (!this._overlayEnabled) {
+            return;
+        }
+
+        const ongoingTransition = this._border.get_transition('opacity');
+
+        // If we're supposed to animate and an animation in our direction
+        // is already happening, let that one continue
+        if (animate &&
+            ongoingTransition &&
+            ongoingTransition.get_interval().peek_final_value() === 255) {
+            return;
+        }
+
+        const toShow = [this._border];
+
+        toShow.forEach(a => {
+            a.opacity = 0;
+            a.show();
+            a.ease({
+                opacity: 255,
+                duration: animate ? WindowPreview.WINDOW_OVERLAY_FADE_TIME : 0,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            });
+        });
+
+        this.emit('show-chrome');
+    });
+
+
     windowOverlayInjections['hideOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', function(animate) {
         const toShow = this._windowCanClose()
             ? [this._border, this._title, this._closeButton]
@@ -85,6 +116,16 @@ function enable() {
                 opacity: 255,
                 duration: 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            });
+        });
+
+        [this._border].forEach(a => {
+            a.opacity = 255;
+            a.ease({
+                opacity: 0,
+                duration: 0,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                // onComplete: () => a.hide(),
             });
         });
     });
