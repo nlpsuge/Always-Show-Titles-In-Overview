@@ -12,12 +12,16 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const WindowPreview = imports.ui.windowPreview;
-const { Clutter } = imports.gi;
+const { Clutter, St } = imports.gi;
 
 let windowOverlayInjections;
 
 var SHOW_TITLE_FULLNAME = false;
-var DEFAULT_DURATION = 0.1
+
+var WINDOW_OVERLAY_FADE_TIME = 200;
+
+var WINDOW_SCALE_TIME = 200;
+var WINDOW_ACTIVE_SIZE_INC = 5; // in each direction
 
 function resetState() {
     windowOverlayInjections = {};
@@ -73,60 +77,79 @@ function removeInjection(objectPrototype, injection, functionName) {
 function enable() {
     resetState();
 
-    windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
-        if (!this._overlayEnabled) {
-            return;
-        }
-
-        const ongoingTransition = this._border.get_transition('opacity');
-
-        // If we're supposed to animate and an animation in our direction
-        // is already happening, let that one continue
-        if (animate &&
-            ongoingTransition &&
-            ongoingTransition.get_interval().peek_final_value() === 255) {
-            return;
-        }
-
-        const toShow = [this._border];
+    // Always show titles and close buttons
+    windowOverlayInjections['_init'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_init', function(animate) {
+        const toShow = this._windowCanClose()
+            ? [this._title, this._closeButton]
+            : [this._title];
 
         toShow.forEach(a => {
-            a.opacity = 0;
+            a.opacity = 255;
             a.show();
             a.ease({
                 opacity: 255,
-                duration: animate ? WindowPreview.WINDOW_OVERLAY_FADE_TIME : 0,
+                duration: animate ? WINDOW_OVERLAY_FADE_TIME : 0,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
+        });
+    });
+
+    // No need to show or hide tittles and close buttons
+    windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
+        if (!this._overlayEnabled)
+            return;
+
+        if (this._overlayShown)
+            return;
+
+        this._overlayShown = true;
+        this._restack();
+
+        // If we're supposed to animate and an animation in our direction
+        // is already happening, let that one continue
+        const ongoingTransition = this._title.get_transition('opacity');
+        if (animate &&
+            ongoingTransition &&
+            ongoingTransition.get_interval().peek_final_value() === 255)
+            return;
+
+        const [width, height] = this.window_container.get_size();
+        const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
+        const activeExtraSize = WINDOW_ACTIVE_SIZE_INC * 2 * scaleFactor;
+        const origSize = Math.max(width, height);
+        const scale = (origSize + activeExtraSize) / origSize;
+
+        this.window_container.ease({
+            scale_x: scale,
+            scale_y: scale,
+            duration: animate ? WINDOW_SCALE_TIME : 0,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
 
         this.emit('show-chrome');
     });
 
-
+    // No need to show or hide tittles and close buttons
     windowOverlayInjections['hideOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', function(animate) {
-        const toShow = this._windowCanClose()
-            ? [this._border, this._title, this._closeButton]
-            : [this._border, this._title];
+        if (!this._overlayShown)
+            return;
 
-        toShow.forEach(a => {
-            a.opacity = 0;
-            a.show();
-            a.ease({
-                opacity: 255,
-                duration: 0,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
-        });
+        this._overlayShown = false;
+        this._restack();
 
-        [this._border].forEach(a => {
-            a.opacity = 255;
-            a.ease({
-                opacity: 0,
-                duration: 0,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                // onComplete: () => a.hide(),
-            });
+        // If we're supposed to animate and an animation in our direction
+        // is already happening, let that one continue
+        const ongoingTransition = this._title.get_transition('opacity');
+        if (animate &&
+            ongoingTransition &&
+            ongoingTransition.get_interval().peek_final_value() === 0)
+            return;
+
+        this.window_container.ease({
+            scale_x: 1,
+            scale_y: 1,
+            duration: animate ? WINDOW_SCALE_TIME : 0,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     });
 
