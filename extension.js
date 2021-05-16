@@ -84,13 +84,7 @@ function enable() {
             : [this._title];
 
         toShow.forEach(a => {
-            a.opacity = 255;
             a.show();
-            a.ease({
-                opacity: 255,
-                duration: animate ? WINDOW_OVERLAY_FADE_TIME : 0,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-            });
         });
     });
 
