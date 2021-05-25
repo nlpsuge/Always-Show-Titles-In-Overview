@@ -3,13 +3,9 @@
   "description": "This extension can be used to show titles of all thumbnails in the Gnome 3 overview.",
   "name": "Always Show Titles In Overview",
   "shell-version": [
-    "3.30.2",
-    "3.32",
-    "3.34",
-    "3.36",
     "3.38"
   ],
   "url": "https://github.com/nlpsuge/Always-Show-Titles-In-Overview",
   "uuid": "Always-Show-Titles-In-Overview@gmail.com",
-  "version": 6
+  "version": 10
 }
