@@ -86,6 +86,48 @@ function enable() {
         toShow.forEach(a => {
             a.show();
         });
+
+        // this._icon.hide()
+        print('============')
+        print("title text -> " + this._title.text)
+        const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
+        print("scaleFactor -> " + scaleFactor)
+        print("offset -> " + this._title.offset)
+
+        print('this._title.translation_y -> ' + this._title.translation_y)
+        print('this._title.translation_x -> ' + this._title.translation_x)
+        print('this._title.y -> ' + this._title.y)
+        print('this._title.x -> ' + this._title.x)
+        print('this._title.scale_x -> ' + this._title.scale_x)
+        print('this._title.scale_y -> ' + this._title.scale_y)
+
+        const previewScale = this.window_container.scale_x;
+        const [previewWidth, previewHeight, ...others] =
+            this.window_container.allocation.get_size();
+
+        const heightIncrease = Math.floor(previewHeight * (previewScale - 1) / 2);
+        const widthIncrease = Math.floor(previewWidth * (previewScale - 1) / 2);
+
+        print('previewScale -> ' + previewScale)
+
+        print('previewWidth -> ' + previewWidth)
+        print('previewHeight -> ' + previewHeight)
+        print('others -> ' + others)
+
+        print('heightIncrease -> ' + heightIncrease)
+        print('widthIncrease -> ' + widthIncrease)
+
+        // this._title.set({
+        //     // x: scale,
+        //     y: this._title.x / 0.2,
+        // });
+        this._title.set({
+            translation_y: -30
+        });
+
+        this._icon.set({
+            translation_y: -30
+        });
     });
 
     // No need to show or hide tittles and close buttons
