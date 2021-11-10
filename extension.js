@@ -114,19 +114,54 @@ function enable() {
         print('previewHeight -> ' + previewHeight)
         print('others -> ' + others)
 
-        print('heightIncrease -> ' + heightIncrease)
-        print('widthIncrease -> ' + widthIncrease)
+        const [width, height] =
+            this.window_container.allocation.get_size();
+
+        print('this.window_container.allocation.width -> ' + width)
+        print('this.window_container.allocation.height -> ' + height)
+
+        print('this.windowCenter.x -> ' + this.windowCenter.x)
+        print('this.windowCenter.y -> ' + this.windowCenter.y)        
+
+        const [width1, height1] = this.window_container.get_size()
+        print('this.window_container.width -> ' + width1)
+        print('this.window_container.height -> ' + height1)
+
+        const [, closeButtonHeight] = this._closeButton.get_preferred_height(-1);
+        print('closeButtonHeight -> ' + closeButtonHeight)
+
+        const [min_width_p, min_height_p, natural_width_p, natural_height_p] 
+            = this.window_container.get_preferred_size()
+        print('min_width_p -> ' + min_width_p)
+        print('min_height_p -> ' + min_height_p)
+        print('natural_width_p -> ' + natural_width_p)
+        print('natural_height_p -> ' + natural_height_p)
+        
+        print('this.metaWindow -> ' + this.metaWindow)
+        print('this.metaWindow.x -> ' + this.metaWindow.x)
+        print('this.metaWindow.y -> ' + this.metaWindow.y)
+        print('this.metaWindow.height -> ' + this.metaWindow.height)
+
+        print('this._closeButton.height -> ' + this._closeButton.height)
+        print('this._title.height -> ' + this._title.height)
+        print('this._icon.height -> ' + this._icon.height)
+        print('this._closeButton.height - this._title.height -> ' + (this._closeButton.height - this._title.height))
+
+        print('this._closeButton.get_preferred_height(-1) -> ' + this._closeButton.get_preferred_height(-1))
+        print('this._title.height -> ' + this._title.height)
+        print('this._icon.get_preferred_height(-1) -> ' + this._icon.get_preferred_height(-1))
+        print('this._closeButton.get_preferred_height(-1) - this._title.height -> ' + (this._closeButton.get_preferred_height(-1) - this._title.height))
 
         // this._title.set({
         //     // x: scale,
         //     y: this._title.x / 0.2,
         // });
         this._title.set({
-            translation_y: -30
+            translation_y: -((this._closeButton.height - this._title.height) / 2)
         });
 
         this._icon.set({
-            translation_y: -30
+            translation_y: -((this._closeButton.height - this._icon.height) / 2)
         });
     });
 
