@@ -88,18 +88,20 @@ function enable() {
         });
 
         // this._icon.hide()
-        print('============')
-        print("title text -> " + this._title.text)
+        print('============');
+        print("this._title -> " + this._title);
+        print("this._icon -> " + this._icon);
+        print("title text -> " + this._title.text);
         const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
-        print("scaleFactor -> " + scaleFactor)
-        print("offset -> " + this._title.offset)
+        print("scaleFactor -> " + scaleFactor);
+        print("offset -> " + this._title.offset);
 
-        print('this._title.translation_y -> ' + this._title.translation_y)
-        print('this._title.translation_x -> ' + this._title.translation_x)
-        print('this._title.y -> ' + this._title.y)
-        print('this._title.x -> ' + this._title.x)
-        print('this._title.scale_x -> ' + this._title.scale_x)
-        print('this._title.scale_y -> ' + this._title.scale_y)
+        print('this._title.translation_y -> ' + this._title.translation_y);
+        print('this._title.translation_x -> ' + this._title.translation_x);
+        print('this._title.y -> ' + this._title.y);
+        print('this._title.x -> ' + this._title.x);
+        print('this._title.scale_x -> ' + this._title.scale_x);
+        print('this._title.scale_y -> ' + this._title.scale_y);
 
         const previewScale = this.window_container.scale_x;
         const [previewWidth, previewHeight, ...others] =
@@ -108,61 +110,76 @@ function enable() {
         const heightIncrease = Math.floor(previewHeight * (previewScale - 1) / 2);
         const widthIncrease = Math.floor(previewWidth * (previewScale - 1) / 2);
 
-        print('previewScale -> ' + previewScale)
+        print('previewScale -> ' + previewScale);
 
-        print('previewWidth -> ' + previewWidth)
-        print('previewHeight -> ' + previewHeight)
-        print('others -> ' + others)
+        print('previewWidth -> ' + previewWidth);
+        print('previewHeight -> ' + previewHeight);
+        print('others -> ' + others);
 
         const [width, height] =
             this.window_container.allocation.get_size();
 
-        print('this.window_container.allocation.width -> ' + width)
-        print('this.window_container.allocation.height -> ' + height)
+        print('this.window_container.allocation.width -> ' + width);
+        print('this.window_container.allocation.height -> ' + height);
 
-        print('this.windowCenter.x -> ' + this.windowCenter.x)
-        print('this.windowCenter.y -> ' + this.windowCenter.y)        
+        print('this.windowCenter.x -> ' + this.windowCenter.x);
+        print('this.windowCenter.y -> ' + this.windowCenter.y);  
 
-        const [width1, height1] = this.window_container.get_size()
-        print('this.window_container.width -> ' + width1)
-        print('this.window_container.height -> ' + height1)
+        const [width1, height1] = this.window_container.get_size();
+        print('this.window_container.get_size.width -> ' + width1);
+        print('this.window_container.get_size.height -> ' + height1);
+
+        print('this.window_container.width -> ' + this.window_container.width);
+        print('this.window_container.height -> ' + this.window_container.height);
+
+        print('this.window_container.x -> ' + this.window_container.x);
+        print('this.window_container.y -> ' + this.window_container.y);
 
         const [, closeButtonHeight] = this._closeButton.get_preferred_height(-1);
-        print('closeButtonHeight -> ' + closeButtonHeight)
+        print('closeButtonHeight -> ' + closeButtonHeight);
 
         const [min_width_p, min_height_p, natural_width_p, natural_height_p] 
-            = this.window_container.get_preferred_size()
-        print('min_width_p -> ' + min_width_p)
-        print('min_height_p -> ' + min_height_p)
-        print('natural_width_p -> ' + natural_width_p)
-        print('natural_height_p -> ' + natural_height_p)
+            = this.window_container.get_preferred_size();
+        print('min_width_p -> ' + min_width_p);
+        print('min_height_p -> ' + min_height_p);
+        print('natural_width_p -> ' + natural_width_p);
+        print('natural_height_p -> ' + natural_height_p);
         
-        print('this.metaWindow -> ' + this.metaWindow)
-        print('this.metaWindow.x -> ' + this.metaWindow.x)
-        print('this.metaWindow.y -> ' + this.metaWindow.y)
-        print('this.metaWindow.height -> ' + this.metaWindow.height)
+        print('this.metaWindow -> ' + this.metaWindow);
+        print('this.metaWindow.x -> ' + this.metaWindow.x);
+        print('this.metaWindow.y -> ' + this.metaWindow.y);
+        print('this.metaWindow.height -> ' + this.metaWindow.height);
 
-        print('this._closeButton.height -> ' + this._closeButton.height)
-        print('this._title.height -> ' + this._title.height)
-        print('this._icon.height -> ' + this._icon.height)
-        print('this._closeButton.height - this._title.height -> ' + (this._closeButton.height - this._title.height))
+        print('this._closeButton.height -> ' + this._closeButton.height);
+        print('this._title.height -> ' + this._title.height);
+        print('this._icon.height -> ' + this._icon.height);
+        print('this._closeButton.height - this._title.height -> ' + (this._closeButton.height - this._title.height));
 
-        print('this._closeButton.get_preferred_height(-1) -> ' + this._closeButton.get_preferred_height(-1))
-        print('this._title.height -> ' + this._title.height)
-        print('this._icon.get_preferred_height(-1) -> ' + this._icon.get_preferred_height(-1))
-        print('this._closeButton.get_preferred_height(-1) - this._title.height -> ' + (this._closeButton.get_preferred_height(-1) - this._title.height))
+        print('this._closeButton.get_preferred_height(-1) -> ' + this._closeButton.get_preferred_height(-1));
+        print('this._title.height -> ' + this._title.height);
+        print('this._icon.get_preferred_height(-1) -> ' + this._icon.get_preferred_height(-1));
+        print('this._closeButton.get_preferred_height(-1) - this._title.height -> ' + (this._closeButton.get_preferred_height(-1) - this._title.height));
+
+        const icon_constraints = this._icon.get_constraints();
+        for (const constraint of icon_constraints) {
+            if (constraint instanceof Clutter.AlignConstraint) {
+                const align_axis = constraint.align_axis;
+                // 1 is Clutter.AlignAxis.Y_AXIS
+                if (align_axis === 1) {
+                    constraint.set_factor(0.5);
+                }
+            }
+        }
+
 
         // this._title.set({
         //     // x: scale,
         //     y: this._title.x / 0.2,
         // });
         this._title.set({
-            translation_y: -((this._closeButton.height - this._title.height) / 2)
+            translation_y: -this._title.height * 2
         });
 
-        this._icon.set({
-            translation_y: -((this._closeButton.height - this._icon.height) / 2)
-        });
     });
 
     // No need to show or hide tittles and close buttons
