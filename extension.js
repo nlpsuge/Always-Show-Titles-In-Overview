@@ -181,13 +181,22 @@ function enable() {
             //     }
             // }
 
-            //
+            // Change to coordinate to Clutter.BindCoordinate.Y
+            // And set offset to make the icon be up a bit
             if (constraint instanceof Clutter.BindConstraint) {
                 const coordinate = constraint.coordinate
                 if (coordinate === Clutter.BindCoordinate.POSITION) {
+                    constraint.set_coordinate(Clutter.BindCoordinate.Y)
                     constraint.set_offset(-this._title.height)
                 }
             }
+
+            // if (constraint instanceof Clutter.AlignConstraint) {
+            //     const align_axis = constraint.align_axis;
+            //     if (align_axis === Clutter.AlignAxis.X_AXIS) {
+            //         constraint.set_factor(0.5);
+            //     }
+            // }
         }
 
         const icon_constraints_new = this._icon.get_constraints();
@@ -197,7 +206,8 @@ function enable() {
 
         // this._icon.add_constraint(new Clutter.BindConstraint({
         //     source: this.window_container,
-        //     coordinate: Clutter.BindCoordinate.X
+        //     coordinate: Clutter.BindCoordinate.X,
+        //     offset: this._title.height
         // }));
         //
         // this._icon.add_constraint(new Clutter.BindConstraint({
