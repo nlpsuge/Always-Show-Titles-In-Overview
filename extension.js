@@ -173,21 +173,21 @@ function enable() {
             }
 
             // Remove Clutter.BindConstraint from this._icon
-            if (constraint instanceof Clutter.BindConstraint) {
-                const coordinate = constraint.coordinate
-                if (coordinate === Clutter.BindCoordinate.POSITION) {
-                    print('removed constraint -> ' + constraint)
-                    this._icon.remove_constraint(constraint)
-                }
-            }
-
-            //
             // if (constraint instanceof Clutter.BindConstraint) {
             //     const coordinate = constraint.coordinate
             //     if (coordinate === Clutter.BindCoordinate.POSITION) {
-            //         constraint.set_factor(this._title.hei)
+            //         print('removed constraint -> ' + constraint)
+            //         this._icon.remove_constraint(constraint)
             //     }
             // }
+
+            //
+            if (constraint instanceof Clutter.BindConstraint) {
+                const coordinate = constraint.coordinate
+                if (coordinate === Clutter.BindCoordinate.POSITION) {
+                    constraint.set_offset(-this._title.height)
+                }
+            }
         }
 
         const icon_constraints_new = this._icon.get_constraints();
@@ -195,15 +195,15 @@ function enable() {
             print('new constraint -> ' + constraint)
         }
 
-        this._icon.add_constraint(new Clutter.BindConstraint({
-            source: this.window_container,
-            coordinate: Clutter.BindCoordinate.X
-        }));
-
-        this._icon.add_constraint(new Clutter.BindConstraint({
-            source: this.window_container,
-            coordinate: Clutter.BindCoordinate.Y
-        }));
+        // this._icon.add_constraint(new Clutter.BindConstraint({
+        //     source: this.window_container,
+        //     coordinate: Clutter.BindCoordinate.X
+        // }));
+        //
+        // this._icon.add_constraint(new Clutter.BindConstraint({
+        //     source: this.window_container,
+        //     coordinate: Clutter.BindCoordinate.Y
+        // }));
 
         const icon_constraints_new_new = this._icon.get_constraints();
         for (const constraint of icon_constraints_new_new) {
