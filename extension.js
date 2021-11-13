@@ -183,6 +183,7 @@ function enable() {
 
             // Change to coordinate to Clutter.BindCoordinate.Y
             // And set offset to make the icon be up a bit
+            // And only when the icon is on the bottom needs to do this code block
             if (constraint instanceof Clutter.BindConstraint) {
                 const coordinate = constraint.coordinate
                 if (coordinate === Clutter.BindCoordinate.POSITION) {
