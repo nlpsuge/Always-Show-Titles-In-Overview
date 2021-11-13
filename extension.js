@@ -179,6 +179,16 @@ function enable() {
         //         constraint.set_pivot_point(new Graphene.Point({ x: -1, y: -19 }))
         //     }
         // }
+        
+        const title_constraints = this._title.get_constraints();
+        for (const constraint of title_constraints) {
+            if (constraint instanceof Clutter.BindConstraint) {
+                const coordinate = constraint.coordinate
+                if (coordinate === Clutter.BindCoordinate.Y) {
+                    constraint.set_offset(0)
+                }
+            }
+        }
 
         // this._title.set({
         //     // x: scale,
@@ -186,10 +196,26 @@ function enable() {
         // });
         
         // TODO config text entry, default -this._title.height * 2
-        this._title.set({
-            translation_y: -this._title.height * 2
-        });
+        // this._title.set({
+        //     translation_y: -this._title.height * 2
+        // });
 
+    });
+
+    windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
+        const currentScale = this.window_container.scale_x;
+        if (currentScale === 1) {
+            this._title.set({
+                // translation_y: -this._title.height
+            });
+            return;
+        }
+        print('currentScale -> ' + currentScale)
+
+        // TODO config text entry, default -this._title.height * 2
+        // this._title.set({
+        //     translation_y: -this._title.height
+        // });
     });
 
     // No need to show or hide tittles and close buttons
@@ -221,6 +247,7 @@ function enable() {
 
 	    print('scale -> ' + scale)
 
+        // Trigger _adjustOverlayOffsets() via notify::scale-x
         this.window_container.ease({
             scale_x: scale,
             scale_y: scale,
@@ -228,6 +255,9 @@ function enable() {
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
 
+	    print('this._title.translation_y -> ' + this._title.translation_y)
+
+        // this.originalTitleHeight = this._title.height + (-this._title.translation_y)
         this.emit('show-chrome');
     });
 
