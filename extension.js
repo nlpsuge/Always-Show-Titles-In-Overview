@@ -21,7 +21,9 @@ var SHOW_TITLE_FULLNAME = false;
 var WINDOW_OVERLAY_FADE_TIME = 200;
 
 var WINDOW_SCALE_TIME = 200;
-var WINDOW_ACTIVE_SIZE_INC = 5; // in each direction
+
+// TODO config range [5, ~20], default 10
+var WINDOW_ACTIVE_SIZE_INC = 10; // in each direction
 
 function resetState() {
     windowOverlayInjections = {};
@@ -165,6 +167,7 @@ function enable() {
             if (constraint instanceof Clutter.AlignConstraint) {
                 const align_axis = constraint.align_axis;
                 if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                    // TODO config choise 0(top), 0.5(middle), 1(bottom)
                     constraint.set_factor(0.5);
                 }
             }
@@ -181,6 +184,8 @@ function enable() {
         //     // x: scale,
         //     y: this._title.x / 0.2,
         // });
+        
+        // TODO config text entry, default -this._title.height * 2
         this._title.set({
             translation_y: -this._title.height * 2
         });
@@ -213,6 +218,8 @@ function enable() {
         const activeExtraSize = WINDOW_ACTIVE_SIZE_INC * 2 * scaleFactor;
         const origSize = Math.max(width, height);
         const scale = (origSize + activeExtraSize) / origSize;
+
+	    print('scale -> ' + scale)
 
         this.window_container.ease({
             scale_x: scale,
