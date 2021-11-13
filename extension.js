@@ -12,7 +12,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const WindowPreview = imports.ui.windowPreview;
-const { Clutter, St } = imports.gi;
+const { Clutter, St, Graphene } = imports.gi;
 
 let windowOverlayInjections;
 
@@ -164,13 +164,18 @@ function enable() {
         for (const constraint of icon_constraints) {
             if (constraint instanceof Clutter.AlignConstraint) {
                 const align_axis = constraint.align_axis;
-                // 1 is Clutter.AlignAxis.Y_AXIS
-                if (align_axis === 1) {
+                if (align_axis === Clutter.AlignAxis.Y_AXIS) {
                     constraint.set_factor(0.5);
                 }
             }
         }
 
+        // const title_constraints = this._title.get_constraints();
+        // for (const constraint of title_constraints) {
+        //     if (constraint instanceof Clutter.AlignConstraint) {
+        //         constraint.set_pivot_point(new Graphene.Point({ x: -1, y: -19 }))
+        //     }
+        // }
 
         // this._title.set({
         //     // x: scale,
@@ -186,6 +191,8 @@ function enable() {
     windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
         if (!this._overlayEnabled)
             return;
+
+        print("_overlayShown -> " + this._overlayShown)
 
         if (this._overlayShown)
             return;
