@@ -168,10 +168,48 @@ function enable() {
                 const align_axis = constraint.align_axis;
                 if (align_axis === Clutter.AlignAxis.Y_AXIS) {
                     // TODO config choise 0(top), 0.5(middle), 1(bottom)
-                    constraint.set_factor(0.5);
+                    constraint.set_factor(1);
                 }
             }
+
+            // Remove Clutter.BindConstraint from this._icon
+            if (constraint instanceof Clutter.BindConstraint) {
+                const coordinate = constraint.coordinate
+                if (coordinate === Clutter.BindCoordinate.POSITION) {
+                    print('removed constraint -> ' + constraint)
+                    this._icon.remove_constraint(constraint)
+                }
+            }
+
+            //
+            // if (constraint instanceof Clutter.BindConstraint) {
+            //     const coordinate = constraint.coordinate
+            //     if (coordinate === Clutter.BindCoordinate.POSITION) {
+            //         constraint.set_factor(this._title.hei)
+            //     }
+            // }
         }
+
+        const icon_constraints_new = this._icon.get_constraints();
+        for (const constraint of icon_constraints_new) {
+            print('new constraint -> ' + constraint)
+        }
+
+        this._icon.add_constraint(new Clutter.BindConstraint({
+            source: this.window_container,
+            coordinate: Clutter.BindCoordinate.X
+        }));
+
+        this._icon.add_constraint(new Clutter.BindConstraint({
+            source: this.window_container,
+            coordinate: Clutter.BindCoordinate.Y
+        }));
+
+        const icon_constraints_new_new = this._icon.get_constraints();
+        for (const constraint of icon_constraints_new_new) {
+            print('new new constraint -> ' + constraint)
+        }
+
 
         // const title_constraints = this._title.get_constraints();
         // for (const constraint of title_constraints) {
