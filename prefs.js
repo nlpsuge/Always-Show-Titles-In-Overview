@@ -52,6 +52,7 @@ const Settings = new Lang.Class({
 });
 
 const BuilderScope = GObject.registerClass({
+    GTypeName: "AlwaysShowTitlesInOverviewBuilderScope",
     Implements: [Gtk.BuilderScope],
 }, class BuilderScope extends GObject.Object {
     _init(preferences) {
