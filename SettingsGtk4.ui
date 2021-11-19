@@ -38,19 +38,27 @@
                                   <object class="GtkBox" id="app_icon_position_butttons_box">
                                     <property name="spacing">32</property>
                                     <child>
-                                      <object class="GtkCheckButton" id="position_bottom_button">
+                                      <object class="GtkToggleButton" id="position_bottom_button">
                                         <property name="label" translatable="yes">Bottom</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
                                         <property name="halign">center</property>
                                         <property name="valign">center</property>
-                                        <property name="active">1</property>
+                                        <property name="active">True</property>
+                                        <signal name="clicked" handler="position_bottom_button_clicked_cb" swapped="no"/>
                                       </object>
                                     </child>
                                     <child>
-                                      <object class="GtkCheckButton" id="position_middle_button">
+                                      <object class="GtkToggleButton" id="position_middle_button">
                                         <property name="label" translatable="yes">Center</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
                                         <property name="halign">center</property>
                                         <property name="valign">center</property>
                                         <property name="group">position_bottom_button</property>
+                                        <signal name="clicked" handler="position_middle_button_clicked_cb" swapped="no"/>
                                       </object>
                                     </child>
                                     <child>
@@ -121,6 +129,7 @@
                                 <property name="focusable">1</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
+                                <property name="active">True</property>
                                 <layout>
                                   <property name="column">1</property>
                                   <property name="row">0</property>
@@ -168,7 +177,7 @@
                       <object class="GtkListBoxRow" id="multimon_primaty_row1">
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkGrid" id="window_active_size_grid">
+                          <object class="GtkGrid" id="window_active_size_inc_grid">
                             <property name="margin-top">6</property>
                             <property name="margin-bottom">6</property>
                             <property name="column-spacing">32</property>
