@@ -2,7 +2,6 @@ const { Gtk, GObject } = imports.gi;
 const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Convenience = Me.imports.convenience;
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 10, 15, 20];
 
