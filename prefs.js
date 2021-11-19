@@ -1,6 +1,7 @@
 const { Gtk, GObject } = imports.gi;
 const Lang = imports.lang;
-const Me = imports.misc.extensionUtils.getCurrentExtension();
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
 const Convenience = Me.imports.convenience;
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 10, 15, 20];
@@ -9,10 +10,18 @@ const Settings = new Lang.Class({
     Name: 'AlwaysShowTitlesInOverviewSettings',
 
     _init: function() {
-        this.render_ui();
+        this._settings = ExtensionUtils.getSettings(
+            'org.gnome.shell.extensions.always-show-titles-in-overview');
+        this._renderUi();
+        this._bindSettings();
     },
 
-    render_ui() {
+    _bindSettings: function() {
+        // this._settings.bind();
+    },
+
+
+    _renderUi() {
         log('Rendering ui')
         this._builder = new Gtk.Builder();
         this._builder.set_scope(new BuilderScope(this));
