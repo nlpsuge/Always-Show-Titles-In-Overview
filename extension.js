@@ -23,8 +23,8 @@ var WINDOW_OVERLAY_FADE_TIME = 200;
 
 var WINDOW_SCALE_TIME = 200;
 
-// TODO config range [5, ~20], default 10
-var WINDOW_ACTIVE_SIZE_INC = 10; // in each direction
+var _settings = ExtensionUtils.getSettings(
+    'org.gnome.shell.extensions.always-show-titles-in-overview');
 
 function resetState() {
     windowOverlayInjections = {};
@@ -138,8 +138,6 @@ function enable() {
 
         }
 
-        const _settings = ExtensionUtils.getSettings(
-            'org.gnome.shell.extensions.always-show-titles-in-overview');
         _settings.connect('changed::app-icon-position', (settings) => {
             _update_app_icon_position(settings, this);
         })
@@ -172,7 +170,8 @@ function enable() {
 
         const [width, height] = this.window_container.get_size();
         const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
-        const activeExtraSize = WINDOW_ACTIVE_SIZE_INC * 2 * scaleFactor;
+        const window_active_size_inc = _settings.get_int('window-active-size-inc');
+        const activeExtraSize = window_active_size_inc * 2 * scaleFactor;
         const origSize = Math.max(width, height);
         const scale = (origSize + activeExtraSize) / origSize;
 
