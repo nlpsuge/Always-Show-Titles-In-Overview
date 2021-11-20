@@ -57,6 +57,7 @@
                                         <property name="receives_default">False</property>
                                         <property name="halign">center</property>
                                         <property name="valign">center</property>
+                                        <!-- Adds to the group of position_bottom_button. In a group of multiple toggle buttons, only one button can be active at a time. -->
                                         <property name="group">position_bottom_button</property>
                                         <signal name="clicked" handler="position_middle_button_clicked_cb" swapped="no"/>
                                       </object>
@@ -104,16 +105,16 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow" id="multimon_multi_row">
+                      <object class="GtkListBoxRow" id="do_not_show_app_icon_when_fullscreen_row">
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkGrid" id="multimon_multi_grid">
+                          <object class="GtkGrid" id="do_not_show_app_icon_when_fullscreen_grid">
                             <property name="margin-top">12</property>
                             <property name="margin-bottom">12</property>
                             <property name="row-spacing">6</property>
                             <property name="column-spacing">32</property>
                             <child>
-                              <object class="GtkLabel" id="multimon_multi_label">
+                              <object class="GtkLabel" id="do_not_show_app_icon_when_fullscreen_label">
                                 <property name="hexpand">1</property>
                                 <property name="label" translatable="yes">Don&apos;t show app icon when fullscreen</property>
                                 <property name="use-markup">1</property>
@@ -125,7 +126,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkSwitch" id="multimon_multi_switch">
+                              <object class="GtkSwitch" id="do_not_show_app_icon_when_fullscreen_switch">
                                 <property name="focusable">1</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>

@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/example-a-example/">
-    <key name="show-indicator" type="b">
+  <enum id='org.gnome.shell.extensions.always-show-titles-in-overview.app-icon-position'>
+    <value value='0' nick='Bottom'/>
+    <value value='1' nick='Center'/>
+  </enum>
+  <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
+    <key name="app-icon-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.app-icon-position">
+      <default>'Bottom'</default>
+    </key>
+    <key name="do-not-show-app-icon-when-fullscreen" type="b">
       <default>true</default>
     </key>
+    <key name="window-active-size-inc" type="i">
+      <default>10</default>
+    </key>
+    
   </schema>
 </schemalist>

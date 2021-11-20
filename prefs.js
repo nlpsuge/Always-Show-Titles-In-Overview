@@ -1,4 +1,4 @@
-const { Gtk, GObject } = imports.gi;
+const { Gtk, GObject, Gio } = imports.gi;
 const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -16,7 +16,21 @@ const Settings = new Lang.Class({
     },
 
     _bindSettings: function() {
-        // this._settings.bind();
+        this._settings.bind(
+            'do-not-show-app-icon-when-fullscreen',
+            this.do_not_show_app_icon_when_fullscreen_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        // GtkScale has no property named value, so we can not bind GtkScale.value, 
+
+        // Listen changes of window-active-size-inc, pass the changed value to GtkScale
+        this._settings.connect('changed::window-active-size-inc', (settings) => {
+            const window_active_size_inc_scale = settings.get_int('window-active-size-inc');
+            log('window-active-size-inc changed: ' + window_active_size_inc_scale);
+            this.window_active_size_inc_scale.set_value(window_active_size_inc_scale);
+        });
     },
 
 
@@ -27,32 +41,41 @@ const Settings = new Lang.Class({
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
         this.notebook = this._builder.get_object('settings_notebook');
 
-        this._builder.get_object('multimon_multi_switch').connect('notify::active', Lang.bind (this, function(widget) {
-            log('switch activate via `Lang.bind (this, function(widget) {}`: ' + widget);
+        this.position_middle_button = this._builder.get_object('position_middle_button');
+        this.position_bottom_button = this._builder.get_object('position_bottom_button');
+        this.app_icon_position = this._settings.get_string('app-icon-position');
+        if (this.app_icon_position === 'Center') {
+            this.position_middle_button.set_active(true);
+        } else {
+            this.position_bottom_button.set_active(true);
+        }
 
-        }));
-
-        this._builder.get_object('multimon_multi_switch').connect('notify::active', (widget) => {
-            log('switch activate via lambda: ' + widget);
-
+        this.do_not_show_app_icon_when_fullscreen_switch = this._builder.get_object('do_not_show_app_icon_when_fullscreen_switch');
+        this.do_not_show_app_icon_when_fullscreen_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            log('switch activate via lambda: ' + active);
+            this._settings.set_boolean('do-not-show-app-icon-when-fullscreen', active);
         });
 
-        let window_active_size_inc_scale = this._builder.get_object('window_active_size_inc_scale');
-        this.window_active_size_inc_scale = window_active_size_inc_scale;
-        window_active_size_inc_scale.set_format_value_func((scale, value) => {
+        this.window_active_size_inc_scale = this._builder.get_object('window_active_size_inc_scale');
+        this.window_active_size_inc_scale.set_format_value_func((scale, value) => {
             return value + ' px';
         });
 
         let min = DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE[0];
         let max = DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE[DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE.length - 1];
-        window_active_size_inc_scale.set_range(min, max);
-        window_active_size_inc_scale.set_value(10);
+        this.window_active_size_inc_scale.set_range(min, max);
+        this.window_active_size_inc_scale.set_value(
+            this._settings.get_int('window-active-size-inc'));
         DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE.slice().forEach(num => {
-            window_active_size_inc_scale.add_mark(num, Gtk.PositionType.TOP, num.toString());
+            this.window_active_size_inc_scale.add_mark(num, Gtk.PositionType.TOP, num.toString());
         })
 
-        window_active_size_inc_scale.connect('value-changed', (scale, value) => {
-            log('The current value is: ' + scale.get_value());
+        // Listen changes of window_active_size_inc_scale, pass the changed value to Gio.Gsettings
+        this.window_active_size_inc_scale.connect('value-changed', (scale) => {
+            const value = scale.get_value();
+            log('The current value is: ' + value);
+            this._settings.set_int('window-active-size-inc', value);
         });
 
     }
@@ -82,12 +105,12 @@ const BuilderScope = GObject.registerClass({
 
     position_bottom_button_clicked_cb(button) {
         log('bottom button clicked: ' + button.get_active());
-
+        this._settings.set_string('app-icon-position', 'Bottom');
     }
 
     position_middle_button_clicked_cb(button) {
         log('middle button clicked: ' + button.get_active());
-
+        this._settings.set_string('app-icon-position', 'Center');
     }
 });
 
