@@ -15,7 +15,7 @@ Please read this post([Gnome 3.26: How to get the window titles in the activitie
 and this comment below [Gnome Bugzilla - Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953).
 
 # Settings
-This extension has a Settings now:
+This extension has a Settings now, which makes it more powerful:
 
 ![image](https://user-images.githubusercontent.com/2271720/142729331-88c19944-4050-40b0-99c9-4e072903250f.png)
 
