@@ -172,6 +172,7 @@ function enable() {
         //     }
         // }
 
+        // Remove title offset to avoid being covered by another window
         const title_constraints = this._title.get_constraints();
         for (const constraint of title_constraints) {
             if (constraint instanceof Clutter.BindConstraint) {
