@@ -128,12 +128,14 @@ function _show_or_hide_app_icon(windowPreview) {
             windowPreview._icon.hide();
         }
     }
-    
+
+    _update_app_icon_position(windowPreview);
 }
 
 function enable() {
     resetState();
 
+    // WindowPreview._init () is called N times if there are N windows when avtive the Overview
     // Always show titles and close buttons
     windowOverlayInjections['_init'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_init', function(animate) {
         const toShow = this._windowCanClose()
@@ -157,15 +159,6 @@ function enable() {
             }
         }
 
-        // icons
-        _settings.connect('changed::app-icon-position', (settings) => {
-            _update_app_icon_position(this);
-        })
-        _update_app_icon_position(this);
-
-        _settings.connect('changed::do-not-show-app-icon-when-fullscreen', (settings) => {
-            _show_or_hide_app_icon(this);
-        });
         _show_or_hide_app_icon(this);
     });
 
