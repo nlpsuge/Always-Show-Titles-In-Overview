@@ -16,6 +16,11 @@ const Settings = new Lang.Class({
     },
 
     _bindSettings: function() {
+        this._settings.connect('changed::app-icon-position', (settings) => {
+            log('app-icon-position changed: ' + settings.get_string('app-icon-position'));
+            this._render_app_icon_position();
+        });
+
         this._settings.bind(
             'do-not-show-app-icon-when-fullscreen',
             this.do_not_show_app_icon_when_fullscreen_switch,
@@ -41,14 +46,7 @@ const Settings = new Lang.Class({
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
         this.notebook = this._builder.get_object('settings_notebook');
 
-        this.position_middle_button = this._builder.get_object('position_middle_button');
-        this.position_bottom_button = this._builder.get_object('position_bottom_button');
-        this.app_icon_position = this._settings.get_string('app-icon-position');
-        if (this.app_icon_position === 'Center') {
-            this.position_middle_button.set_active(true);
-        } else {
-            this.position_bottom_button.set_active(true);
-        }
+        this._render_app_icon_position();
 
         this.do_not_show_app_icon_when_fullscreen_switch = this._builder.get_object('do_not_show_app_icon_when_fullscreen_switch');
         this.do_not_show_app_icon_when_fullscreen_switch.connect('notify::active', (widget) => {
@@ -78,8 +76,20 @@ const Settings = new Lang.Class({
             this._settings.set_int('window-active-size-inc', value);
         });
 
-    }
+    },
     
+    _render_app_icon_position() {
+        this.position_middle_button = this._builder.get_object('position_middle_button');
+        this.position_bottom_button = this._builder.get_object('position_bottom_button');
+        this.app_icon_position = this._settings.get_string('app-icon-position');
+        if (this.app_icon_position === 'Center') {
+            this.position_middle_button.set_active(true);
+        }
+        else {
+            this.position_bottom_button.set_active(true);
+        }
+    }
+
 });
 
 const BuilderScope = GObject.registerClass({
@@ -105,12 +115,12 @@ const BuilderScope = GObject.registerClass({
 
     position_bottom_button_clicked_cb(button) {
         log('bottom button clicked: ' + button.get_active());
-        this._settings.set_string('app-icon-position', 'Bottom');
+        this._preferences._settings.set_string('app-icon-position', 'Bottom');
     }
 
     position_middle_button_clicked_cb(button) {
         log('middle button clicked: ' + button.get_active());
-        this._settings.set_string('app-icon-position', 'Center');
+        this._preferences._settings.set_string('app-icon-position', 'Center');
     }
 });
 
