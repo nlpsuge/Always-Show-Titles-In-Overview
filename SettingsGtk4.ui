@@ -17,7 +17,7 @@
             <child>
               <object class="GtkFrame" id="app_icon_frame">
                 <property name="child">
-                  <object class="GtkListBox" id="multimon_listbox">
+                  <object class="GtkListBox" id="show_app_icon_multimon_listbox">
                     <property name="selection_mode">none</property>
                     <child>
                       <object class="GtkListBoxRow" id="show_app_icon_multi_row">
@@ -77,10 +77,10 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow" id="multimon_primaty_row">
+                      <object class="GtkListBoxRow" id="app_icon_position_multimon_primaty_row">
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkGrid" id="multimon_primary_grid">
+                          <object class="GtkGrid" id="app_icon_position_multimon_primary_grid">
                             <property name="margin-top">12</property>
                             <property name="margin-bottom">12</property>
                             <property name="row-spacing">32</property>
@@ -235,10 +235,10 @@
             <child>
               <object class="GtkFrame" id="window_container_frame">
                 <property name="child">
-                  <object class="GtkListBox" id="multimon_listbox1">
+                  <object class="GtkListBox" id="window_active_size_inc_multimon_listbox">
                     <property name="selection_mode">none</property>
                     <child>
-                      <object class="GtkListBoxRow" id="multimon_primaty_row1">
+                      <object class="GtkListBoxRow" id="window_active_size_inc_multimon_primaty_row">
                         <property name="focusable">1</property>
                         <property name="child">
                           <object class="GtkGrid" id="window_active_size_inc_grid">
