@@ -79,13 +79,13 @@ function removeInjection(objectPrototype, injection, functionName) {
     }
 }
 
-function _update_app_icon_position(that) {
+function _update_app_icon_position(windowPreview) {
     const app_icon_position = _settings.get_string('app-icon-position');
     let icon_factor = 1;
     if (app_icon_position === 'Center') {
         icon_factor = 0.5
     }
-    const icon_constraints = that._icon.get_constraints();
+    const icon_constraints = windowPreview._icon.get_constraints();
     for (const constraint of icon_constraints) {
         if (constraint instanceof Clutter.AlignConstraint) {
             const align_axis = constraint.align_axis;
@@ -103,7 +103,7 @@ function _update_app_icon_position(that) {
                 const coordinate = constraint.coordinate
                 if (coordinate === Clutter.BindCoordinate.POSITION) {
                     constraint.set_coordinate(Clutter.BindCoordinate.Y)
-                    constraint.set_offset(-that._title.height)
+                    constraint.set_offset(-windowPreview._title.height)
                 }
             }
         }
