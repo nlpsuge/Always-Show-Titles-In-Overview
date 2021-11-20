@@ -13,6 +13,7 @@
 
 const WindowPreview = imports.ui.windowPreview;
 const { Clutter, St, Graphene } = imports.gi;
+const ExtensionUtils = imports.misc.extensionUtils;
 
 let windowOverlayInjections;
 
@@ -162,65 +163,7 @@ function enable() {
         print('this._icon.get_preferred_height(-1) -> ' + this._icon.get_preferred_height(-1));
         print('this._closeButton.get_preferred_height(-1) - this._title.height -> ' + (this._closeButton.get_preferred_height(-1) - this._title.height));
 
-        const icon_constraints = this._icon.get_constraints();
-        for (const constraint of icon_constraints) {
-            if (constraint instanceof Clutter.AlignConstraint) {
-                const align_axis = constraint.align_axis;
-                if (align_axis === Clutter.AlignAxis.Y_AXIS) {
-                    // TODO config choise 0(top), 0.5(middle), 1(bottom)
-                    constraint.set_factor(1);
-                }
-            }
-
-            // Remove Clutter.BindConstraint from this._icon
-            // if (constraint instanceof Clutter.BindConstraint) {
-            //     const coordinate = constraint.coordinate
-            //     if (coordinate === Clutter.BindCoordinate.POSITION) {
-            //         print('removed constraint -> ' + constraint)
-            //         this._icon.remove_constraint(constraint)
-            //     }
-            // }
-
-            // Change to coordinate to Clutter.BindCoordinate.Y
-            // And set offset to make the icon be up a bit
-            // And only when the icon is on the bottom needs to do this code block
-            if (constraint instanceof Clutter.BindConstraint) {
-                const coordinate = constraint.coordinate
-                if (coordinate === Clutter.BindCoordinate.POSITION) {
-                    constraint.set_coordinate(Clutter.BindCoordinate.Y)
-                    constraint.set_offset(-this._title.height)
-                }
-            }
-
-            // if (constraint instanceof Clutter.AlignConstraint) {
-            //     const align_axis = constraint.align_axis;
-            //     if (align_axis === Clutter.AlignAxis.X_AXIS) {
-            //         constraint.set_factor(0.5);
-            //     }
-            // }
-        }
-
-        const icon_constraints_new = this._icon.get_constraints();
-        for (const constraint of icon_constraints_new) {
-            print('new constraint -> ' + constraint)
-        }
-
-        // this._icon.add_constraint(new Clutter.BindConstraint({
-        //     source: this.window_container,
-        //     coordinate: Clutter.BindCoordinate.X,
-        //     offset: this._title.height
-        // }));
-        //
-        // this._icon.add_constraint(new Clutter.BindConstraint({
-        //     source: this.window_container,
-        //     coordinate: Clutter.BindCoordinate.Y
-        // }));
-
-        const icon_constraints_new_new = this._icon.get_constraints();
-        for (const constraint of icon_constraints_new_new) {
-            print('new new constraint -> ' + constraint)
-        }
-
+        // titles
 
         // const title_constraints = this._title.get_constraints();
         // for (const constraint of title_constraints) {
@@ -228,7 +171,7 @@ function enable() {
         //         constraint.set_pivot_point(new Graphene.Point({ x: -1, y: -19 }))
         //     }
         // }
-        
+
         const title_constraints = this._title.get_constraints();
         for (const constraint of title_constraints) {
             if (constraint instanceof Clutter.BindConstraint) {
@@ -243,12 +186,87 @@ function enable() {
         //     // x: scale,
         //     y: this._title.x / 0.2,
         // });
-        
+
         // TODO config text entry, default -this._title.height * 2
         // this._title.set({
         //     translation_y: -this._title.height * 2
         // });
 
+
+        function _update_app_icon_position(settings, that) {
+            const app_icon_position = settings.get_string('app-icon-position');
+            let icon_factor = 1;
+            if (app_icon_position === 'Center') {
+                icon_factor = 0.5
+            }
+            const icon_constraints = that._icon.get_constraints();
+            for (const constraint of icon_constraints) {
+                if (constraint instanceof Clutter.AlignConstraint) {
+                    const align_axis = constraint.align_axis;
+                    if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                        // TODO config choise 0(top), 0.5(middle), 1(bottom)
+                        constraint.set_factor(icon_factor);
+                    }
+                }
+
+                // Remove Clutter.BindConstraint from this._icon
+                // if (constraint instanceof Clutter.BindConstraint) {
+                //     const coordinate = constraint.coordinate
+                //     if (coordinate === Clutter.BindCoordinate.POSITION) {
+                //         print('removed constraint -> ' + constraint)
+                //         this._icon.remove_constraint(constraint)
+                //     }
+                // }
+
+                // Change to coordinate to Clutter.BindCoordinate.Y
+                // And set offset to make the icon be up a bit
+                // And only when the icon is on the bottom needs to do this code block
+                if (constraint instanceof Clutter.BindConstraint) {
+                    const coordinate = constraint.coordinate
+                    if (coordinate === Clutter.BindCoordinate.POSITION) {
+                        constraint.set_coordinate(Clutter.BindCoordinate.Y)
+                        constraint.set_offset(-that._title.height)
+                    }
+                }
+
+                // if (constraint instanceof Clutter.AlignConstraint) {
+                //     const align_axis = constraint.align_axis;
+                //     if (align_axis === Clutter.AlignAxis.X_AXIS) {
+                //         constraint.set_factor(0.5);
+                //     }
+                // }
+            }
+
+            const icon_constraints_new = that._icon.get_constraints();
+            for (const constraint of icon_constraints_new) {
+                print('new constraint -> ' + constraint)
+            }
+
+            // this._icon.add_constraint(new Clutter.BindConstraint({
+            //     source: this.window_container,
+            //     coordinate: Clutter.BindCoordinate.X,
+            //     offset: this._title.height
+            // }));
+            //
+            // this._icon.add_constraint(new Clutter.BindConstraint({
+            //     source: this.window_container,
+            //     coordinate: Clutter.BindCoordinate.Y
+            // }));
+
+            const icon_constraints_new_new = that._icon.get_constraints();
+            for (const constraint of icon_constraints_new_new) {
+                print('new new constraint -> ' + constraint)
+            }
+
+
+        }
+
+        const _settings = ExtensionUtils.getSettings(
+            'org.gnome.shell.extensions.always-show-titles-in-overview');
+        _settings.connect('changed::app-icon-position', (settings) => {
+            _update_app_icon_position(settings, this);
+        })
+        _update_app_icon_position(_settings, this);
     });
 
     windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
@@ -347,11 +365,4 @@ function disable() {
 
 function init() {
     // do nothing
-}
-
-
-/* 3.0 API backward compatibility */
-function main() {
-    init();
-    enable();
 }
