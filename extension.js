@@ -165,13 +165,6 @@ function enable() {
 
         // titles
 
-        // const title_constraints = this._title.get_constraints();
-        // for (const constraint of title_constraints) {
-        //     if (constraint instanceof Clutter.AlignConstraint) {
-        //         constraint.set_pivot_point(new Graphene.Point({ x: -1, y: -19 }))
-        //     }
-        // }
-
         // Remove title offset to avoid being covered by another window
         const title_constraints = this._title.get_constraints();
         for (const constraint of title_constraints) {
@@ -183,16 +176,7 @@ function enable() {
             }
         }
 
-        // this._title.set({
-        //     // x: scale,
-        //     y: this._title.x / 0.2,
-        // });
-
-        // TODO config text entry, default -this._title.height * 2
-        // this._title.set({
-        //     translation_y: -this._title.height * 2
-        // });
-
+        // icons
 
         function _update_app_icon_position(settings, that) {
             const app_icon_position = settings.get_string('app-icon-position');
@@ -210,15 +194,6 @@ function enable() {
                     }
                 }
 
-                // Remove Clutter.BindConstraint from this._icon
-                // if (constraint instanceof Clutter.BindConstraint) {
-                //     const coordinate = constraint.coordinate
-                //     if (coordinate === Clutter.BindCoordinate.POSITION) {
-                //         print('removed constraint -> ' + constraint)
-                //         this._icon.remove_constraint(constraint)
-                //     }
-                // }
-
                 // Change to coordinate to Clutter.BindCoordinate.Y
                 // And set offset to make the icon be up a bit
                 // And only when the icon is on the bottom needs to do this code block
@@ -230,35 +205,7 @@ function enable() {
                     }
                 }
 
-                // if (constraint instanceof Clutter.AlignConstraint) {
-                //     const align_axis = constraint.align_axis;
-                //     if (align_axis === Clutter.AlignAxis.X_AXIS) {
-                //         constraint.set_factor(0.5);
-                //     }
-                // }
             }
-
-            const icon_constraints_new = that._icon.get_constraints();
-            for (const constraint of icon_constraints_new) {
-                print('new constraint -> ' + constraint)
-            }
-
-            // this._icon.add_constraint(new Clutter.BindConstraint({
-            //     source: this.window_container,
-            //     coordinate: Clutter.BindCoordinate.X,
-            //     offset: this._title.height
-            // }));
-            //
-            // this._icon.add_constraint(new Clutter.BindConstraint({
-            //     source: this.window_container,
-            //     coordinate: Clutter.BindCoordinate.Y
-            // }));
-
-            const icon_constraints_new_new = that._icon.get_constraints();
-            for (const constraint of icon_constraints_new_new) {
-                print('new new constraint -> ' + constraint)
-            }
-
 
         }
 
@@ -280,18 +227,12 @@ function enable() {
         }
         print('currentScale -> ' + currentScale)
 
-        // TODO config text entry, default -this._title.height * 2
-        // this._title.set({
-        //     translation_y: -this._title.height
-        // });
     });
 
     // No need to show or hide tittles and close buttons
     windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
         if (!this._overlayEnabled)
             return;
-
-        print("_overlayShown -> " + this._overlayShown)
 
         if (this._overlayShown)
             return;
@@ -313,8 +254,6 @@ function enable() {
         const origSize = Math.max(width, height);
         const scale = (origSize + activeExtraSize) / origSize;
 
-	    print('scale -> ' + scale)
-
         // Trigger _adjustOverlayOffsets() via notify::scale-x
         this.window_container.ease({
             scale_x: scale,
@@ -322,8 +261,6 @@ function enable() {
             duration: animate ? WINDOW_SCALE_TIME : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
-
-	    print('this._title.translation_y -> ' + this._title.translation_y)
 
         // this.originalTitleHeight = this._title.height + (-this._title.translation_y)
         this.emit('show-chrome');
