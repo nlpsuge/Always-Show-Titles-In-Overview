@@ -116,7 +116,7 @@
                             <child>
                               <object class="GtkLabel" id="do_not_show_app_icon_when_fullscreen_label">
                                 <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Don&apos;t show app icon when fullscreen</property>
+                                <property name="label" translatable="yes">Don&apos;t show the app icon when fullscreen</property>
                                 <property name="use-markup">1</property>
                                 <property name="xalign">0</property>
                                 <layout>
