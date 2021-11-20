@@ -7,7 +7,13 @@
       <object class="GtkNotebookPage">
         <property name="child">
           <object class="GtkBox">
+            <property name="margin_start">24</property>
+            <property name="margin_end">24</property>
+            <property name="margin_top">24</property>
+            <property name="margin_bottom">24</property>
             <property name="orientation">vertical</property>
+            <!-- GtkBox: Sets the “spacing” property of box , which is the number of pixels to place between children of box . -->
+            <property name="spacing">24</property>
             <child>
               <object class="GtkFrame" id="app_icon_frame">
                 <property name="child">
