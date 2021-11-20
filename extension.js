@@ -79,6 +79,39 @@ function removeInjection(objectPrototype, injection, functionName) {
     }
 }
 
+function _update_app_icon_position(that) {
+    const app_icon_position = _settings.get_string('app-icon-position');
+    let icon_factor = 1;
+    if (app_icon_position === 'Center') {
+        icon_factor = 0.5
+    }
+    const icon_constraints = that._icon.get_constraints();
+    for (const constraint of icon_constraints) {
+        if (constraint instanceof Clutter.AlignConstraint) {
+            const align_axis = constraint.align_axis;
+            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                // TODO config choise 0(top), 0.5(middle), 1(bottom)
+                constraint.set_factor(icon_factor);
+            }
+        }
+
+        // Change to coordinate to Clutter.BindCoordinate.Y
+        // And set offset to make the icon be up a bit
+        // And only when the icon is on the bottom needs to do this code block
+        if (app_icon_position === 'Bottom') {
+            if (constraint instanceof Clutter.BindConstraint) {
+                const coordinate = constraint.coordinate
+                if (coordinate === Clutter.BindCoordinate.POSITION) {
+                    constraint.set_coordinate(Clutter.BindCoordinate.Y)
+                    constraint.set_offset(-that._title.height)
+                }
+            }
+        }
+
+    }
+
+}
+
 function _show_or_hide_app_icon(windowPreview) {
     
     const do_not_show_app_icon_when_fullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
@@ -118,44 +151,10 @@ function enable() {
         }
 
         // icons
-
-        function _update_app_icon_position(settings, that) {
-            const app_icon_position = settings.get_string('app-icon-position');
-            let icon_factor = 1;
-            if (app_icon_position === 'Center') {
-                icon_factor = 0.5
-            }
-            const icon_constraints = that._icon.get_constraints();
-            for (const constraint of icon_constraints) {
-                if (constraint instanceof Clutter.AlignConstraint) {
-                    const align_axis = constraint.align_axis;
-                    if (align_axis === Clutter.AlignAxis.Y_AXIS) {
-                        // TODO config choise 0(top), 0.5(middle), 1(bottom)
-                        constraint.set_factor(icon_factor);
-                    }
-                }
-
-                // Change to coordinate to Clutter.BindCoordinate.Y
-                // And set offset to make the icon be up a bit
-                // And only when the icon is on the bottom needs to do this code block
-                if (app_icon_position === 'Bottom') {
-                    if (constraint instanceof Clutter.BindConstraint) {
-                        const coordinate = constraint.coordinate
-                        if (coordinate === Clutter.BindCoordinate.POSITION) {
-                            constraint.set_coordinate(Clutter.BindCoordinate.Y)
-                            constraint.set_offset(-that._title.height)
-                        }
-                    }
-                }
-
-            }
-
-        }
-
         _settings.connect('changed::app-icon-position', (settings) => {
-            _update_app_icon_position(settings, this);
+            _update_app_icon_position(this);
         })
-        _update_app_icon_position(_settings, this);
+        _update_app_icon_position(this);
 
         _settings.connect('changed::do-not-show-app-icon-when-fullscreen', (settings) => {
             _show_or_hide_app_icon(this);
