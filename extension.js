@@ -113,7 +113,14 @@ function _update_app_icon_position(that) {
 }
 
 function _show_or_hide_app_icon(windowPreview) {
-    
+    // show or hide all app icons
+    const show_app_icon =  _settings.get_boolean('show-app-icon');
+    if (!show_app_icon) {
+        windowPreview._icon.hide();
+        return;
+    }
+
+    // show or hide some app icons
     const do_not_show_app_icon_when_fullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
     if (do_not_show_app_icon_when_fullscreen) {
         const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()

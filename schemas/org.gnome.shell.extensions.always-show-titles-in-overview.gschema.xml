@@ -5,6 +5,13 @@
     <value value='1' nick='Center'/>
   </enum>
   <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
+    <key name="show-app-icon" type="b">
+      <default>true</default>
+      <summary>Show app icons in the Overview</summary>
+      <description>
+      Whether show app icons in the Overview or not.
+      </description>
+    </key>
     <key name="app-icon-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.app-icon-position">
       <default>'Bottom'</default>
       <summary>App icon position</summary>

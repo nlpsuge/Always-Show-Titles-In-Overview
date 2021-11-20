@@ -16,6 +16,13 @@ const Settings = new Lang.Class({
     },
 
     _bindSettings: function() {
+        this._settings.bind(
+            'show-app-icon',
+            this.show_app_icon_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
         this._settings.connect('changed::app-icon-position', (settings) => {
             log('app-icon-position changed: ' + settings.get_string('app-icon-position'));
             this._render_app_icon_position();
@@ -46,12 +53,19 @@ const Settings = new Lang.Class({
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
         this.notebook = this._builder.get_object('settings_notebook');
 
+        this.show_app_icon_switch = this._builder.get_object('show_app_icon_switch');
+        this.show_app_icon_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            log('show_app_icon_switch activate via lambda: ' + active);
+            this._settings.set_boolean('show-app-icon', active);
+        });
+
         this._render_app_icon_position();
 
         this.do_not_show_app_icon_when_fullscreen_switch = this._builder.get_object('do_not_show_app_icon_when_fullscreen_switch');
         this.do_not_show_app_icon_when_fullscreen_switch.connect('notify::active', (widget) => {
             const active = widget.active;
-            log('switch activate via lambda: ' + active);
+            log('do_not_show_app_icon_when_fullscreen_switch activate via lambda: ' + active);
             this._settings.set_boolean('do-not-show-app-icon-when-fullscreen', active);
         });
 
