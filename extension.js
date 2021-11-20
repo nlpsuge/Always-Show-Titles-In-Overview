@@ -14,6 +14,8 @@
 const WindowPreview = imports.ui.windowPreview;
 const { Clutter, St, Graphene } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
+const Main = imports.ui.main;
 
 let windowOverlayInjections;
 
@@ -75,6 +77,33 @@ function removeInjection(objectPrototype, injection, functionName) {
     } else {
         objectPrototype[functionName] = injection[functionName];
     }
+}
+
+function _show_or_hide_app_icon(windowPreview) {
+    
+    const do_not_show_app_icon_when_fullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
+    if (do_not_show_app_icon_when_fullscreen) {
+        const workspaceManager = global.workspace_manager;
+        const nWorkspaces = workspaceManager.get_n_workspaces();
+        const workspaceIndices = [...Array(nWorkspaces).keys()];
+        for (const i of workspaceIndices) {
+            const ws = workspaceManager.get_workspace_by_index(i);
+            const windows = ws.list_windows()
+            for (w of windows) {
+                if (w.is_fullscreen()) {
+                    windowPreview._icon.hide();
+                }
+            }
+        }
+        // const workspaceManager = global.workspace_manager;
+
+        // const primaryMonitor = Main.layoutManager.primaryMonitor;
+        // print('primaryMonitor： ' + primaryMonitor)
+        // if (primaryMonitor.inFullscreen) {
+        //     this._icon.hide();
+        // }
+    }
+    
 }
 
 function enable() {
@@ -142,6 +171,11 @@ function enable() {
             _update_app_icon_position(settings, this);
         })
         _update_app_icon_position(_settings, this);
+
+        _settings.connect('changed::do-not-show-app-icon-when-fullscreen', (settings) => {
+            _show_or_hide_app_icon(this);
+        });
+        _show_or_hide_app_icon(this);
     });
 
     windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
