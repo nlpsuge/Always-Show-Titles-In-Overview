@@ -30,7 +30,7 @@
       </description>
     </key>
     <key name="window-active-size-inc" type="i">
-      <default>10</default>
+      <default>15</default>
       <summary>Window active size increment, in pixels maybe ...</summary>
       <description>
       In Overview, when the cusor hovers over a window, the window will 
