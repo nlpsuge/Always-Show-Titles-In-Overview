@@ -12,7 +12,10 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const WindowPreview = imports.ui.windowPreview;
-const { Clutter, St } = imports.gi;
+const { Clutter, St, Graphene } = imports.gi;
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
+const Main = imports.ui.main;
 
 let windowOverlayInjections;
 
@@ -21,7 +24,9 @@ var SHOW_TITLE_FULLNAME = false;
 var WINDOW_OVERLAY_FADE_TIME = 200;
 
 var WINDOW_SCALE_TIME = 200;
-var WINDOW_ACTIVE_SIZE_INC = 5; // in each direction
+
+var _settings = ExtensionUtils.getSettings(
+    'org.gnome.shell.extensions.always-show-titles-in-overview');
 
 function resetState() {
     windowOverlayInjections = {};
@@ -74,9 +79,76 @@ function removeInjection(objectPrototype, injection, functionName) {
     }
 }
 
+function _update_app_icon_position(windowPreview) {
+    const app_icon_position = _settings.get_string('app-icon-position');
+    let icon_factor = 1;
+    if (app_icon_position === 'Center') {
+        icon_factor = 0.5
+    }
+
+    const icon_constraints = windowPreview._icon.get_constraints();
+    for (const constraint of icon_constraints) {
+        if (constraint instanceof Clutter.AlignConstraint) {
+            const align_axis = constraint.align_axis;
+            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                // 0(top), 0.5(middle), 1(bottom)
+                constraint.set_factor(icon_factor);
+            }
+        }
+
+        // Change to coordinate to Clutter.BindCoordinate.Y
+        // And set offset to make the icon be up a bit
+        // And only when the icon is on the bottom needs to do this code block
+        if (app_icon_position === 'Bottom') {
+            if (!constraint instanceof Clutter.BindConstraint) {
+                continue;
+            }
+            const coordinate = constraint.coordinate
+            if (coordinate !== Clutter.BindCoordinate.POSITION) {
+                continue;
+            }
+            
+            // Change icon's constraint in notify::realized,
+            // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
+            windowPreview.connect('notify::realized', () => {
+                if (!windowPreview.realized) {
+                    return;
+                }
+
+                constraint.set_coordinate(Clutter.BindCoordinate.Y);
+                constraint.set_offset(-windowPreview._title.height / 2);
+
+                windowPreview._title.ensure_style();
+                windowPreview._icon.ensure_style();
+            });
+        }
+    }
+}
+
+function _show_or_hide_app_icon(windowPreview) {
+    // show or hide all app icons
+    const show_app_icon =  _settings.get_boolean('show-app-icon');
+    if (!show_app_icon) {
+        windowPreview._icon.hide();
+        return;
+    }
+
+    // show or hide some app icons
+    const do_not_show_app_icon_when_fullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
+    if (do_not_show_app_icon_when_fullscreen) {
+        const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
+        if (window_is_fullscreen) {
+            windowPreview._icon.hide();
+        }
+    }
+
+    _update_app_icon_position(windowPreview);
+}
+
 function enable() {
     resetState();
 
+    // WindowPreview._init () is called N times if there are N windows when avtive the Overview
     // Always show titles and close buttons
     windowOverlayInjections['_init'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_init', function(animate) {
         const toShow = this._windowCanClose()
@@ -86,6 +158,26 @@ function enable() {
         toShow.forEach(a => {
             a.show();
         });
+
+        // titles
+
+        // Remove title offset to avoid being covered by another window
+        const title_constraints = this._title.get_constraints();
+        for (const constraint of title_constraints) {
+            if (constraint instanceof Clutter.BindConstraint) {
+                const coordinate = constraint.coordinate
+                if (coordinate === Clutter.BindCoordinate.Y) {
+                    constraint.set_offset(0)
+                }
+            }
+        }
+
+        _show_or_hide_app_icon(this);
+    });
+
+    windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
+        // nothing
+
     });
 
     // No need to show or hide tittles and close buttons
@@ -109,10 +201,12 @@ function enable() {
 
         const [width, height] = this.window_container.get_size();
         const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
-        const activeExtraSize = WINDOW_ACTIVE_SIZE_INC * 2 * scaleFactor;
+        const window_active_size_inc = _settings.get_int('window-active-size-inc');
+        const activeExtraSize = window_active_size_inc * 2 * scaleFactor;
         const origSize = Math.max(width, height);
         const scale = (origSize + activeExtraSize) / origSize;
 
+        // Trigger _adjustOverlayOffsets() via notify::scale-x
         this.window_container.ease({
             scale_x: scale,
             scale_y: scale,
@@ -120,6 +214,7 @@ function enable() {
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
 
+        // this.originalTitleHeight = this._title.height + (-this._title.translation_y)
         this.emit('show-chrome');
     });
 
@@ -160,11 +255,4 @@ function disable() {
 
 function init() {
     // do nothing
-}
-
-
-/* 3.0 API backward compatibility */
-function main() {
-    init();
-    enable();
 }
