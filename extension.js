@@ -85,6 +85,7 @@ function _update_app_icon_position(windowPreview) {
     if (app_icon_position === 'Center') {
         icon_factor = 0.5
     }
+
     const icon_constraints = windowPreview._icon.get_constraints();
     for (const constraint of icon_constraints) {
         if (constraint instanceof Clutter.AlignConstraint) {
@@ -99,17 +100,29 @@ function _update_app_icon_position(windowPreview) {
         // And set offset to make the icon be up a bit
         // And only when the icon is on the bottom needs to do this code block
         if (app_icon_position === 'Bottom') {
-            if (constraint instanceof Clutter.BindConstraint) {
-                const coordinate = constraint.coordinate
-                if (coordinate === Clutter.BindCoordinate.POSITION) {
-                    constraint.set_coordinate(Clutter.BindCoordinate.Y)
-                    constraint.set_offset(-windowPreview._title.height)
-                }
+            if (!constraint instanceof Clutter.BindConstraint) {
+                continue;
             }
+            const coordinate = constraint.coordinate
+            if (coordinate !== Clutter.BindCoordinate.POSITION) {
+                continue;
+            }
+            
+            // Change icon's constraint in notify::realized,
+            // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
+            windowPreview.connect('notify::realized', () => {
+                if (!windowPreview.realized) {
+                    return;
+                }
+
+                constraint.set_coordinate(Clutter.BindCoordinate.Y);
+                constraint.set_offset(-windowPreview._title.height / 2);
+
+                windowPreview._title.ensure_style();
+                windowPreview._icon.ensure_style();
+            });
         }
-
     }
-
 }
 
 function _show_or_hide_app_icon(windowPreview) {
