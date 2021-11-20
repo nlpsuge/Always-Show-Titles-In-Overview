@@ -90,7 +90,7 @@ function _update_app_icon_position(windowPreview) {
         if (constraint instanceof Clutter.AlignConstraint) {
             const align_axis = constraint.align_axis;
             if (align_axis === Clutter.AlignAxis.Y_AXIS) {
-                // TODO config choise 0(top), 0.5(middle), 1(bottom)
+                // 0(top), 0.5(middle), 1(bottom)
                 constraint.set_factor(icon_factor);
             }
         }
