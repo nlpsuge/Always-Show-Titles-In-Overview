@@ -1,10 +1,17 @@
 # Always-Show-Titles-In-Overview
-This extension can be used to show titles of all thumbnails in the Gnome 3 overview.![](https://github.com/nlpsuge/Always-Show-Titles-In-Overview/blob/master/Screenshot1.png)
+This a Gnome Shell extension, which shows titles of all windows in the Overview.
 
-# Why I write such an extention
-Please read this post([Gnome 3.26: How to get the window titles in the activities view back?
-](https://www.reddit.com/r/gnome/comments/7dk1kb/gnome_326_how_to_get_the_window_titles_in_the/))
-and this comment below a bug report([Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953)).
+![image](https://user-images.githubusercontent.com/2271720/142729037-df43f6b3-4891-40b0-8441-d28861aba544.png)
+
+# Why I write this extention
+Please read this post([Gnome 3.26: How to get the window titles in the activities view back?](https://www.reddit.com/r/gnome/comments/7dk1kb/gnome_326_how_to_get_the_window_titles_in_the/))
+and this comment below [Gnome Bugzilla - Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953).
+
+# Settings
+This extension has a Settings now:
+
+![image](https://user-images.githubusercontent.com/2271720/142729331-88c19944-4050-40b0-99c9-4e072903250f.png)
+
 
 # TODO
 - [x] Remove the fade time when leave a window
