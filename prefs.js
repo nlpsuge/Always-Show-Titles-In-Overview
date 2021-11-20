@@ -58,6 +58,10 @@ const Settings = new Lang.Class({
             const active = widget.active;
             log('show_app_icon_switch activate via lambda: ' + active);
             this._settings.set_boolean('show-app-icon', active);
+            
+            this.position_bottom_button.set_sensitive(active);
+            this.position_middle_button.set_sensitive(active);
+            this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(active);
         });
 
         this._render_app_icon_position();
