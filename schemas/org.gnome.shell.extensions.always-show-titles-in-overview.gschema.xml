@@ -7,12 +7,29 @@
   <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
     <key name="app-icon-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.app-icon-position">
       <default>'Bottom'</default>
+      <summary>App icon position</summary>
+      <description>
+      App icon position, supporting 'Bottom', 'Center'. 
+      Default is 'Bottom'.
+      </description>
     </key>
     <key name="do-not-show-app-icon-when-fullscreen" type="b">
       <default>true</default>
+      <summary>Don't show app icon when fullscreen</summary>
+      <description>
+      If a window is in fullscreen mode, like playing video in Firefox,
+      do not show the app icon on the overlay. Because it could cover the 
+      playing video.
+      </description>
     </key>
     <key name="window-active-size-inc" type="i">
       <default>10</default>
+      <summary>Window active size increment, in pixels maybe ...</summary>
+      <description>
+      In Overview, when the cusor hovers over a window, the window will 
+      become a little larger, so we can tell which window we are going 
+      to click.
+      </description>
     </key>
     
   </schema>
