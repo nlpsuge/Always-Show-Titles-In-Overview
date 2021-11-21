@@ -254,7 +254,10 @@ function disable() {
 
     resetState();
 
+    // Destroy the created object
     if (_settings) {
+        // GObject.Object.run_dispose(): Releases all references to other objects.
+        _settings.run_dispose();
         _settings = null;
     }
 }
