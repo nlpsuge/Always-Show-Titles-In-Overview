@@ -1,21 +1,22 @@
 const { Gtk, GObject, Gio } = imports.gi;
-const Lang = imports.lang;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 15, 25, 35, 45, 55, 60];
 
-const Settings = new Lang.Class({
-    Name: 'AlwaysShowTitlesInOverviewSettings',
+const Settings = GObject.registerClass({
+    GTypeName: 'AlwaysShowTitlesInOverviewSettings', 
+}, class Settings extends Gtk.Notebook {
+    _init() {
+        super._init();
 
-    _init: function() {
         this._settings = ExtensionUtils.getSettings(
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         this._renderUi();
         this._bindSettings();
-    },
+    }
 
-    _bindSettings: function() {
+    _bindSettings() {
         this._settings.bind(
             'show-app-icon',
             this.show_app_icon_switch,
@@ -43,7 +44,7 @@ const Settings = new Lang.Class({
             log('window-active-size-inc changed: ' + window_active_size_inc_scale);
             this.window_active_size_inc_scale.set_value(window_active_size_inc_scale);
         });
-    },
+    }
 
 
     _renderUi() {
@@ -94,8 +95,8 @@ const Settings = new Lang.Class({
             this._settings.set_int('window-active-size-inc', value);
         });
 
-    },
-    
+    }
+
     _render_app_icon_position() {
         this.position_middle_button = this._builder.get_object('position_middle_button');
         this.position_bottom_button = this._builder.get_object('position_bottom_button');
@@ -115,8 +116,8 @@ const BuilderScope = GObject.registerClass({
     Implements: [Gtk.BuilderScope],
 }, class BuilderScope extends GObject.Object {
     _init(preferences) {
-        this._preferences = preferences;
         super._init();
+        this._preferences = preferences;
     }
 
     // Fix: Gtk.BuilderError: Creating closures is not supported by Gjs_BuilderScope
