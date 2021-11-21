@@ -249,7 +249,7 @@
                               <object class="GtkLabel" id="window_active_size_inc_label">
                                 <property name="label" translatable="yes">Window active
 size increment
-(default is 10)</property>
+(default is 15)</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
