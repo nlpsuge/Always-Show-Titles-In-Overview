@@ -48,7 +48,6 @@ const Settings = GObject.registerClass({
 
 
     _renderUi() {
-        log('Rendering ui')
         this._builder = new Gtk.Builder();
         this._builder.set_scope(new BuilderScope(this));
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');

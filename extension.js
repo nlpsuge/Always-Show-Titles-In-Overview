@@ -25,8 +25,7 @@ var WINDOW_OVERLAY_FADE_TIME = 200;
 
 var WINDOW_SCALE_TIME = 200;
 
-var _settings = ExtensionUtils.getSettings(
-    'org.gnome.shell.extensions.always-show-titles-in-overview');
+let _settings = null;
 
 function resetState() {
     windowOverlayInjections = {};
@@ -146,6 +145,9 @@ function _show_or_hide_app_icon(windowPreview) {
 }
 
 function enable() {
+    _settings = ExtensionUtils.getSettings(
+        'org.gnome.shell.extensions.always-show-titles-in-overview');
+
     resetState();
 
     // WindowPreview._init () is called N times if there are N windows when avtive the Overview
@@ -251,6 +253,10 @@ function disable() {
     }
 
     resetState();
+
+    if (_settings) {
+        _settings = null;
+    }
 }
 
 function init() {
