@@ -5,7 +5,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 15, 25, 35, 45, 55, 60];
 
 const Settings = GObject.registerClass({
-    GTypeName: 'AlwaysShowTitlesInOverviewSettings', 
+    GTypeName: 'AlwaysShowTitlesInOverviewSettings',
 }, class Settings extends Gtk.Notebook {
     _init() {
         super._init();
@@ -36,7 +36,7 @@ const Settings = GObject.registerClass({
             Gio.SettingsBindFlags.DEFAULT
         );
 
-        // GtkScale has no property named value, so we can not bind GtkScale.value, 
+        // GtkScale has no property named value, so we can not bind GtkScale.value,
 
         // Listen changes of window-active-size-inc, pass the changed value to GtkScale
         this._settings.connect('changed::window-active-size-inc', (settings) => {
@@ -58,7 +58,7 @@ const Settings = GObject.registerClass({
             const active = widget.active;
             log('show_app_icon_switch activate via lambda: ' + active);
             this._settings.set_boolean('show-app-icon', active);
-            
+
             this.position_bottom_button.set_sensitive(active);
             this.position_middle_button.set_sensitive(active);
             this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(active);
@@ -85,7 +85,7 @@ const Settings = GObject.registerClass({
             this._settings.get_int('window-active-size-inc'));
         DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE.slice().forEach(num => {
             this.window_active_size_inc_scale.add_mark(num, Gtk.PositionType.TOP, num.toString());
-        })
+        });
 
         // Listen changes of window_active_size_inc_scale, pass the changed value to Gio.Gsettings
         this.window_active_size_inc_scale.connect('value-changed', (scale) => {
@@ -111,7 +111,7 @@ const Settings = GObject.registerClass({
 });
 
 const BuilderScope = GObject.registerClass({
-    GTypeName: "AlwaysShowTitlesInOverviewBuilderScope",
+    GTypeName: 'AlwaysShowTitlesInOverviewBuilderScope',
     Implements: [Gtk.BuilderScope],
 }, class BuilderScope extends GObject.Object {
     _init(preferences) {

@@ -14,14 +14,8 @@
 const WindowPreview = imports.ui.windowPreview;
 const { Clutter, St, Graphene } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Main = imports.ui.main;
 
 let windowOverlayInjections;
-
-var SHOW_TITLE_FULLNAME = false;
-
-var WINDOW_OVERLAY_FADE_TIME = 200;
 
 var WINDOW_SCALE_TIME = 200;
 
@@ -106,7 +100,7 @@ function _update_app_icon_position(windowPreview) {
             if (coordinate !== Clutter.BindCoordinate.POSITION) {
                 continue;
             }
-            
+
             // Change icon's constraint in notify::realized,
             // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
             windowPreview.connect('notify::realized', () => {
