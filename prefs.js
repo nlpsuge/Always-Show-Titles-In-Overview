@@ -44,6 +44,13 @@ const Settings = GObject.registerClass({
             log('window-active-size-inc changed: ' + window_active_size_inc_scale);
             this.window_active_size_inc_scale.set_value(window_active_size_inc_scale);
         });
+
+        this._settings.bind(
+            'hide-background',
+            this.hide_background_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
     }
 
 
@@ -93,6 +100,8 @@ const Settings = GObject.registerClass({
             log('The current value is: ' + value);
             this._settings.set_int('window-active-size-inc', value);
         });
+
+        this.hide_background_switch = this._builder.get_object('hide_background_switch');
 
     }
 

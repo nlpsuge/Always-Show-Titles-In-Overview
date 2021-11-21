@@ -38,6 +38,12 @@
       to click.
       </description>
     </key>
-    
+    <key name="hide-background" type="b">
+      <default>false</default>
+      <summary>Hide the background in the Overview</summary>
+      <description>
+      Whether hide the background in the Overview or not.
+      </description>
+    </key>
   </schema>
 </schemalist>
