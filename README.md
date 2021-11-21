@@ -17,7 +17,7 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 # Settings
 This extension has a Settings now, which makes it more powerful:
 
-![image](https://user-images.githubusercontent.com/2271720/142729331-88c19944-4050-40b0-99c9-4e072903250f.png)
+![image](https://user-images.githubusercontent.com/2271720/142750014-4fb29ede-a8a7-4281-9e4b-2cddbb652266.png)
 
 
 # TODO
