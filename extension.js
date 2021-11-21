@@ -14,19 +14,12 @@
 const WindowPreview = imports.ui.windowPreview;
 const { Clutter, St, Graphene } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Main = imports.ui.main;
 
 let windowOverlayInjections;
 
-var SHOW_TITLE_FULLNAME = false;
-
-var WINDOW_OVERLAY_FADE_TIME = 200;
-
 var WINDOW_SCALE_TIME = 200;
 
-var _settings = ExtensionUtils.getSettings(
-    'org.gnome.shell.extensions.always-show-titles-in-overview');
+let _settings = null;
 
 function resetState() {
     windowOverlayInjections = {};
@@ -107,7 +100,7 @@ function _update_app_icon_position(windowPreview) {
             if (coordinate !== Clutter.BindCoordinate.POSITION) {
                 continue;
             }
-            
+
             // Change icon's constraint in notify::realized,
             // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
             windowPreview.connect('notify::realized', () => {
@@ -146,6 +139,9 @@ function _show_or_hide_app_icon(windowPreview) {
 }
 
 function enable() {
+    _settings = ExtensionUtils.getSettings(
+        'org.gnome.shell.extensions.always-show-titles-in-overview');
+
     resetState();
 
     // WindowPreview._init () is called N times if there are N windows when avtive the Overview
@@ -251,6 +247,13 @@ function disable() {
     }
 
     resetState();
+
+    // Destroy the created object
+    if (_settings) {
+        // GObject.Object.run_dispose(): Releases all references to other objects.
+        _settings.run_dispose();
+        _settings = null;
+    }
 }
 
 function init() {
