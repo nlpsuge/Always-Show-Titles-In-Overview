@@ -6,17 +6,17 @@ var ObjectPrototype = class ObjectPrototype {
         this.injections = {};
     }
 
-    injectToFunction(objectPrototype, functionName, injectedFunction) {
+    injectOrOverrideFunction(objectPrototype, functionName, injected, targetFunction) {
         let originalFunction = objectPrototype[functionName];
     
         objectPrototype[functionName] = function() {
             let returnValue;
     
-            if (originalFunction !== undefined) {
+            if (injected && originalFunction !== undefined) {
                 returnValue = originalFunction.apply(this, arguments);
             }
     
-            let injectedReturnValue = injectedFunction.apply(this, arguments);
+            let injectedReturnValue = targetFunction.apply(this, arguments);
             if (returnValue === undefined) {
                 returnValue = injectedReturnValue;
             }

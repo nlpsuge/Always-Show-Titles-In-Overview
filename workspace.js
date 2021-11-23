@@ -37,7 +37,7 @@ var ASTIOWorkspace = class {
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         _objectPrototype = new ObjectPrototype.ObjectPrototype()
 
-        _objectPrototype.injectToFunction(WorkspacesView.WorkspacesDisplay.prototype, 'prepareToEnterOverview', function(){
+        _objectPrototype.injectOrOverrideFunction(WorkspacesView.WorkspacesDisplay.prototype, 'prepareToEnterOverview', true, function(){
             const _workspacesView = this._workspacesViews[0];
             for (const workspace of _workspacesView._workspaces) {
                 _show_or_hide_background(workspace);
@@ -46,14 +46,16 @@ var ASTIOWorkspace = class {
     }
 
     // Destroy the created object
-    disable() {
-        _objectPrototype.removeInjections(WorkspacesView.WorkspacesDisplay.prototype);
-        _objectPrototype = null;
-
+    disable() { 
         if (_settings) {
             // GObject.Object.run_dispose(): Releases all references to other objects.
             _settings.run_dispose();
             _settings = null;
+        }
+
+        if (_objectPrototype) {
+            _objectPrototype.removeInjections(WorkspacesView.WorkspacesDisplay.prototype);
+            _objectPrototype = null;    
         }
         
     }

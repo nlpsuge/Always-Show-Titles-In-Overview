@@ -17,6 +17,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Workspace = Me.imports.workspace;
+const ObjectPrototype = Me.imports.utils.objectPrototype;
 
 let windowOverlayInjections;
 
@@ -26,55 +27,17 @@ let _settings = null;
 
 let _ASTIOWorkspace;
 
-function resetState() {
-    windowOverlayInjections = {};
-}
+let _objectPrototype; 
 
-function injectToFunction(objectPrototype, functionName, injectedFunction) {
-    let originalFunction = objectPrototype[functionName];
+function _initializeObject() {
+    _settings = ExtensionUtils.getSettings(
+        'org.gnome.shell.extensions.always-show-titles-in-overview');
 
-    objectPrototype[functionName] = function() {
-        let returnValue;
+    _ASTIOWorkspace = new Workspace.ASTIOWorkspace();
+    _ASTIOWorkspace.enable();
 
-        if (originalFunction !== undefined) {
-            returnValue = originalFunction.apply(this, arguments);
-        }
+    _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
-        let injectedReturnValue = injectedFunction.apply(this, arguments);
-        if (returnValue === undefined) {
-            returnValue = injectedReturnValue;
-        }
-
-        return returnValue;
-    }
-
-    return originalFunction;
-}
-
-// override original functions
-function overrideFunction(objectPrototype, functionName, injectedFunction) {
-    let originalFunction = objectPrototype[functionName];
-
-    objectPrototype[functionName] = function() {
-        let returnValue;
-
-        let injectedReturnValue = injectedFunction.apply(this, arguments);
-        if (returnValue === undefined) {
-            returnValue = injectedReturnValue;
-        }
-
-        return returnValue;
-    }
-
-    return originalFunction;
-}
-
-function removeInjection(objectPrototype, injection, functionName) {
-    if (injection[functionName] === undefined) {
-        delete objectPrototype[functionName];
-    } else {
-        objectPrototype[functionName] = injection[functionName];
-    }
 }
 
 function _update_app_icon_position(windowPreview) {
@@ -144,17 +107,11 @@ function _show_or_hide_app_icon(windowPreview) {
 }
 
 function enable() {
-    _settings = ExtensionUtils.getSettings(
-        'org.gnome.shell.extensions.always-show-titles-in-overview');
-
-    _ASTIOWorkspace = new Workspace.ASTIOWorkspace();
-    _ASTIOWorkspace.enable();
-    
-    resetState();
+    _initializeObject();
 
     // WindowPreview._init () is called N times if there are N windows when avtive the Overview
     // Always show titles and close buttons
-    windowOverlayInjections['_init'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_init', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_init', true, function(animate) {
         const toShow = this._windowCanClose()
             ? [this._title, this._closeButton]
             : [this._title];
@@ -179,13 +136,13 @@ function enable() {
         _show_or_hide_app_icon(this);
     });
 
-    windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
         // nothing
 
     });
 
     // No need to show or hide tittles and close buttons
-    windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', false, function(animate) {
         if (!this._overlayEnabled)
             return;
 
@@ -223,7 +180,7 @@ function enable() {
     });
 
     // No need to show or hide tittles and close buttons
-    windowOverlayInjections['hideOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', false, function(animate) {
         if (!this._overlayShown)
             return;
 
@@ -250,12 +207,6 @@ function enable() {
 }
 
 function disable() {
-    for (let functionName in windowOverlayInjections) {
-        removeInjection(WindowPreview.WindowPreview.prototype, windowOverlayInjections, functionName);
-    }
-
-    resetState();
-
     // Destroy the created object
     if (_settings) {
         // GObject.Object.run_dispose(): Releases all references to other objects.
@@ -267,6 +218,12 @@ function disable() {
         _ASTIOWorkspace.disable();
         _ASTIOWorkspace = null;
     }
+
+    if (_objectPrototype) {
+        _objectPrototype.removeInjections(WindowPreview.WindowPreview.prototype);
+        _objectPrototype = null;
+    }
+
 }
 
 function init() {
