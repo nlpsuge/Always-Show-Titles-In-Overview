@@ -1,11 +1,14 @@
 
 const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
 const WorkspacesView = imports.ui.workspacesView;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 
+const ObjectPrototype = Me.imports.utils.objectPrototype
 
-let windowOverlayInjections = {};
+let _objectPrototype;
+
 let _settings;
 
 /**
@@ -23,35 +26,6 @@ function _show_or_hide_background(workspaceView) {
     }
 }
 
-function injectToFunction(objectPrototype, functionName, injectedFunction) {
-    let originalFunction = objectPrototype[functionName];
-
-    objectPrototype[functionName] = function() {
-        let returnValue;
-
-        if (originalFunction !== undefined) {
-            returnValue = originalFunction.apply(this, arguments);
-        }
-
-        let injectedReturnValue = injectedFunction.apply(this, arguments);
-        if (returnValue === undefined) {
-            returnValue = injectedReturnValue;
-        }
-
-        return returnValue;
-    }
-
-    return originalFunction;
-}
-
-function removeInjection(objectPrototype, injection, functionName) {
-    if (injection[functionName] === undefined) {
-        delete objectPrototype[functionName];
-    } else {
-        objectPrototype[functionName] = injection[functionName];
-    }
-}
-
 var ASTIOWorkspace = class {
 
     constructor() {
@@ -61,8 +35,9 @@ var ASTIOWorkspace = class {
     enable() {
         _settings = ExtensionUtils.getSettings(
             'org.gnome.shell.extensions.always-show-titles-in-overview');
+        _objectPrototype = new ObjectPrototype.ObjectPrototype()
 
-        windowOverlayInjections['prepareToEnterOverview'] = injectToFunction(WorkspacesView.WorkspacesDisplay.prototype, 'prepareToEnterOverview', function(){
+        _objectPrototype.injectToFunction(WorkspacesView.WorkspacesDisplay.prototype, 'prepareToEnterOverview', function(){
             const _workspacesView = this._workspacesViews[0];
             for (const workspace of _workspacesView._workspaces) {
                 _show_or_hide_background(workspace);
@@ -70,14 +45,11 @@ var ASTIOWorkspace = class {
         });
     }
 
+    // Destroy the created object
     disable() {
-        for (let functionName in windowOverlayInjections) {
-            removeInjection(WorkspacesView.WorkspacesDisplay.prototype, windowOverlayInjections, functionName);
-        }
+        _objectPrototype.removeInjections(WorkspacesView.WorkspacesDisplay.prototype);
+        _objectPrototype = null;
 
-        windowOverlayInjections = {};
-
-        // Destroy the created object
         if (_settings) {
             // GObject.Object.run_dispose(): Releases all references to other objects.
             _settings.run_dispose();
