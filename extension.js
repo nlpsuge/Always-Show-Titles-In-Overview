@@ -18,9 +18,6 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 const Workspace = Me.imports.workspace;
 
-const Main = imports.ui.main;
-const Overview = imports.ui.overview;
-
 let windowOverlayInjections;
 
 var WINDOW_SCALE_TIME = 200;
@@ -189,37 +186,6 @@ function enable() {
 
     // No need to show or hide tittles and close buttons
     windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
-        // Main.overview.controls is undefined
-        const overview_chilren = Main.layoutManager.overviewGroup.get_children();
-        for (const child of overview_chilren) {
-            if (child instanceof Overview.OverviewActor) {
-                const controls = child.controls;
-                const _workspacesDisplay = controls._workspacesDisplay;
-                const _workspacesViews = _workspacesDisplay._workspacesViews;
-                for (const _workspacesView of _workspacesViews) {
-                    print('ui_overview_OverviewActor.controls._workspacesDisplay._workspacesViews._workspacesView: ' + _workspacesView);
-                    print('_workspaces._workspaces: ' + _workspacesView._workspaces);
-                    print('_workspaces._workspaces.length: ' + _workspacesView._workspaces.length);
-
-                    for (workspace of _workspacesView._workspaces) {
-                        print('_workspacesView._workspaces._workspace: ' + workspace);
-                        // _show_or_hide_background();
-                        const hide_background = _settings.get_boolean('hide-background');
-                        if (hide_background) {
-                            workspace._background.hide();
-                        } else {
-                            workspace._background.show();
-                        }
-                    }
-
-                    break;
-                }
-
-            }
-        }
-
-
-
         if (!this._overlayEnabled)
             return;
 
