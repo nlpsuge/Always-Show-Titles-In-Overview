@@ -11,15 +11,15 @@ let _settings;
 /**
  * windowPreview._workspace._background is a Widget, so we can just hide it
  *
- * @param   {Object} instance of WorkspacesView
+ * @param   {workspaceView} workspaceView instance of WorkspacesView
  * @returns {void}
  */
-function _show_or_hide_background(workspace) {
+function _show_or_hide_background(workspaceView) {
     const hide_background = _settings.get_boolean('hide-background');
     if (hide_background) {
-        workspace._background.hide();
+        workspaceView._background.hide();
     } else {
-        workspace._background.show();
+        workspaceView._background.show();
     }
 }
 
