@@ -55,7 +55,7 @@ var ASTIOWorkspace = class {
 
 var EmptyWorkspaceBackground = GObject.registerClass(
 class WorkspaceBackground extends St.Widget {
-    _init(metaWorkspace, monitorIndex, overviewAdjustment)  {
+    _init(monitorIndex, stateAdjustment)  {
         super._init();
     }
 });
