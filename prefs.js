@@ -14,6 +14,13 @@ const Settings = GObject.registerClass({
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         this._renderUi();
         this._bindSettings();
+        
+        
+        const show_app_icon_switch_active = this._settings.get_boolean('show-app-icon');
+        this.position_bottom_button.set_sensitive(show_app_icon_switch_active);
+        this.position_middle_button.set_sensitive(show_app_icon_switch_active);
+        this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(show_app_icon_switch_active);
+
     }
 
     _bindSettings() {
@@ -72,7 +79,7 @@ const Settings = GObject.registerClass({
             log('do_not_show_app_icon_when_fullscreen_switch activate via lambda: ' + active);
             this._settings.set_boolean('do-not-show-app-icon-when-fullscreen', active);
         });
-
+        
         this.window_active_size_inc_scale = this._builder.get_object('window_active_size_inc_scale');
         this.window_active_size_inc_scale.set_format_value_func((scale, value) => {
             return value + ' px';
