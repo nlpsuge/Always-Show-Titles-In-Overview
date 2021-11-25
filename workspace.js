@@ -21,7 +21,7 @@ function _show_or_hide_workspace_background() {
     }
 }
 
-var ASTIOWorkspace = class {
+var CustomWorkspace = class {
 
     constructor() {
 
@@ -53,9 +53,10 @@ var ASTIOWorkspace = class {
 
 }
 
+// TODO Can't update stage views actor <unnamed>[<Gjs_Always-Show-Titles-In-Overview_gmail_com_workspace_WorkspaceBackground>:0x36d5af3563f8] is on because it needs an allocation.
 var EmptyWorkspaceBackground = GObject.registerClass(
 class WorkspaceBackground extends St.Widget {
-    _init(monitorIndex, stateAdjustment)  {
+    _init()  {
         super._init();
     }
 });

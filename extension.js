@@ -25,7 +25,7 @@ var WINDOW_SCALE_TIME = 200;
 
 let _settings = null;
 
-let _ASTIOWorkspace;
+let customWorkspace;
 
 let _objectPrototype; 
 
@@ -33,8 +33,8 @@ function _initializeObject() {
     _settings = ExtensionUtils.getSettings(
         'org.gnome.shell.extensions.always-show-titles-in-overview');
 
-    _ASTIOWorkspace = new Workspace.ASTIOWorkspace();
-    _ASTIOWorkspace.enable();
+    customWorkspace = new Workspace.CustomWorkspace();
+    customWorkspace.enable();
 
     _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
@@ -214,9 +214,9 @@ function disable() {
         _settings = null;
     }
 
-    if (_ASTIOWorkspace) {
-        _ASTIOWorkspace.disable();
-        _ASTIOWorkspace = null;
+    if (customWorkspace) {
+        customWorkspace.disable();
+        customWorkspace = null;
     }
 
     if (_objectPrototype) {
