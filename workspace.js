@@ -6,6 +6,7 @@ const WorkspacesView = imports.ui.workspacesView;
 const Main = imports.ui.main;
 const Overview = imports.ui.overview;
 const Workspace = imports.ui.workspace;
+const OverviewControls = imports.ui.overviewControls;
 
 const ObjectPrototype = Me.imports.utils.objectPrototype;
 
@@ -60,6 +61,12 @@ var CustomWorkspace = class {
                 _animateFromOverview(windowPreview, true);
             }
         });
+
+        _objectPrototype.injectOrOverrideFunction(OverviewControls.ControlsManager.prototype, 'animateFromOverview', true, function() {
+            // TODO search entry bin and thumbnails box disappear smoothly
+        });
+
+
     }
 
     // Destroy the created object
