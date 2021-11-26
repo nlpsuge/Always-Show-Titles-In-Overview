@@ -26,7 +26,7 @@ const Settings = GObject.registerClass({
 
         this._settings.connect('changed::app-icon-position', (settings) => {
             log('app-icon-position changed: ' + settings.get_string('app-icon-position'));
-            this._render_app_icon_position();
+            this._renderAppIconPosition();
         });
 
         this._settings.bind(
@@ -71,7 +71,7 @@ const Settings = GObject.registerClass({
             this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(active);
         });
 
-        this._render_app_icon_position();
+        this._renderAppIconPosition();
 
         this.do_not_show_app_icon_when_fullscreen_switch = this._builder.get_object('do_not_show_app_icon_when_fullscreen_switch');
         this.do_not_show_app_icon_when_fullscreen_switch.connect('notify::active', (widget) => {
@@ -105,7 +105,7 @@ const Settings = GObject.registerClass({
 
     }
 
-    _render_app_icon_position() {
+    _renderAppIconPosition() {
         this.position_middle_button = this._builder.get_object('position_middle_button');
         this.position_bottom_button = this._builder.get_object('position_bottom_button');
         this.app_icon_position = this._settings.get_string('app-icon-position');

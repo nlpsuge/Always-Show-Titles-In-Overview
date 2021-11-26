@@ -40,7 +40,7 @@ function _initializeObject() {
 
 }
 
-function _update_app_icon_position(windowPreview) {
+function _updateAppIconPosition(windowPreview) {
     const app_icon_position = _settings.get_string('app-icon-position');
     let icon_factor = 1;
     if (app_icon_position === 'Center') {
@@ -86,7 +86,7 @@ function _update_app_icon_position(windowPreview) {
     }
 }
 
-function _show_or_hide_app_icon(windowPreview) {
+function _showOrHideAppIcon(windowPreview) {
     // show or hide all app icons
     const show_app_icon =  _settings.get_boolean('show-app-icon');
     if (!show_app_icon) {
@@ -103,7 +103,7 @@ function _show_or_hide_app_icon(windowPreview) {
         }
     }
 
-    _update_app_icon_position(windowPreview);
+    _updateAppIconPosition(windowPreview);
 }
 
 function enable() {
@@ -133,7 +133,7 @@ function enable() {
             }
         }
 
-        _show_or_hide_app_icon(this);
+        _showOrHideAppIcon(this);
     });
 
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
