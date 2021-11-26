@@ -13,15 +13,12 @@ const WINDOW_OVERLAY_FADE_TIME = 200;
 let _settings;
 let _objectPrototype;
 
-function _show_or_hide_workspace_background() {
+function _showHideWorkspaceBackground(workspaceBackground) {
     const hide_background = _settings.get_boolean('hide-background');
     if (hide_background) {
-        Workspace.OriginalWorkspaceBackground = Workspace.WorkspaceBackground;
-        Workspace.WorkspaceBackground = EmptyWorkspaceBackground;
+        workspaceBackground.hide();
     } else {
-        if (Workspace.OriginalWorkspaceBackground) {
-            Workspace.WorkspaceBackground = Workspace.OriginalWorkspaceBackground;
-        }
+        workspaceBackground.show();
     }
 }
 
@@ -51,10 +48,9 @@ var CustomWorkspace = class {
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
-        _settings.connect('changed::hide-background', (settings) => {
-            _show_or_hide_workspace_background();
+        _objectPrototype.injectOrOverrideFunction(Workspace.WorkspaceBackground.prototype, '_init', true, function() {
+            _showHideWorkspaceBackground(this);
         });
-        _show_or_hide_workspace_background();
 
         _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, 'prepareToLeaveOverview', true, function() {
             for (let i = 0; i < this._windows.length; i++) {
@@ -72,11 +68,6 @@ var CustomWorkspace = class {
             _settings = null;
         }
 
-        if (Workspace.OriginalWorkspaceBackground) {
-            Workspace.WorkspaceBackground = Workspace.OriginalWorkspaceBackground;
-            Workspace.OriginalWorkspaceBackground = null;
-        }
-
         if (_objectPrototype) {
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
             _objectPrototype = null;
@@ -84,12 +75,3 @@ var CustomWorkspace = class {
     }
 
 }
-
-// TODO Can't update stage views actor <unnamed>[<Gjs_Always-Show-Titles-In-Overview_gmail_com_workspace_WorkspaceBackground>:0x36d5af3563f8] is on because it needs an allocation.
-var EmptyWorkspaceBackground = GObject.registerClass(
-class WorkspaceBackground extends St.Widget {
-    _init()  {
-        super._init();
-    }
-});
-
