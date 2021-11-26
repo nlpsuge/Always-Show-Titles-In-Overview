@@ -48,6 +48,8 @@ var CustomWorkspace = class {
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
+        // Since other extensions (eg, dash-to-panel) could use Workspace.WorkspaceBackground, I can't just remove it any more.
+        // Hide the Workspace.WorkspaceBackground after be initialized
         _objectPrototype.injectOrOverrideFunction(Workspace.WorkspaceBackground.prototype, '_init', true, function() {
             _showHideWorkspaceBackground(this);
         });
