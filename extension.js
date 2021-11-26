@@ -14,6 +14,10 @@
 const WindowPreview = imports.ui.windowPreview;
 const { Clutter, St, Graphene } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
+
+const Workspace = Me.imports.workspace;
+const ObjectPrototype = Me.imports.utils.objectPrototype;
 
 let windowOverlayInjections;
 
@@ -21,58 +25,22 @@ var WINDOW_SCALE_TIME = 200;
 
 let _settings = null;
 
-function resetState() {
-    windowOverlayInjections = {};
+let customWorkspace;
+
+let _objectPrototype; 
+
+function _initializeObject() {
+    _settings = ExtensionUtils.getSettings(
+        'org.gnome.shell.extensions.always-show-titles-in-overview');
+
+    customWorkspace = new Workspace.CustomWorkspace();
+    customWorkspace.enable();
+
+    _objectPrototype = new ObjectPrototype.ObjectPrototype();
+
 }
 
-function injectToFunction(objectPrototype, functionName, injectedFunction) {
-    let originalFunction = objectPrototype[functionName];
-
-    objectPrototype[functionName] = function() {
-        let returnValue;
-
-        if (originalFunction !== undefined) {
-            returnValue = originalFunction.apply(this, arguments);
-        }
-
-        let injectedReturnValue = injectedFunction.apply(this, arguments);
-        if (returnValue === undefined) {
-            returnValue = injectedReturnValue;
-        }
-
-        return returnValue;
-    }
-
-    return originalFunction;
-}
-
-// override original functions
-function overrideFunction(objectPrototype, functionName, injectedFunction) {
-    let originalFunction = objectPrototype[functionName];
-
-    objectPrototype[functionName] = function() {
-        let returnValue;
-
-        let injectedReturnValue = injectedFunction.apply(this, arguments);
-        if (returnValue === undefined) {
-            returnValue = injectedReturnValue;
-        }
-
-        return returnValue;
-    }
-
-    return originalFunction;
-}
-
-function removeInjection(objectPrototype, injection, functionName) {
-    if (injection[functionName] === undefined) {
-        delete objectPrototype[functionName];
-    } else {
-        objectPrototype[functionName] = injection[functionName];
-    }
-}
-
-function _update_app_icon_position(windowPreview) {
+function _updateAppIconPosition(windowPreview) {
     const app_icon_position = _settings.get_string('app-icon-position');
     let icon_factor = 1;
     if (app_icon_position === 'Center') {
@@ -118,7 +86,7 @@ function _update_app_icon_position(windowPreview) {
     }
 }
 
-function _show_or_hide_app_icon(windowPreview) {
+function _showOrHideAppIcon(windowPreview) {
     // show or hide all app icons
     const show_app_icon =  _settings.get_boolean('show-app-icon');
     if (!show_app_icon) {
@@ -135,18 +103,15 @@ function _show_or_hide_app_icon(windowPreview) {
         }
     }
 
-    _update_app_icon_position(windowPreview);
+    _updateAppIconPosition(windowPreview);
 }
 
 function enable() {
-    _settings = ExtensionUtils.getSettings(
-        'org.gnome.shell.extensions.always-show-titles-in-overview');
-
-    resetState();
+    _initializeObject();
 
     // WindowPreview._init () is called N times if there are N windows when avtive the Overview
     // Always show titles and close buttons
-    windowOverlayInjections['_init'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_init', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_init', true, function(animate) {
         const toShow = this._windowCanClose()
             ? [this._title, this._closeButton]
             : [this._title];
@@ -168,16 +133,16 @@ function enable() {
             }
         }
 
-        _show_or_hide_app_icon(this);
+        _showOrHideAppIcon(this);
     });
 
-    windowOverlayInjections['_adjustOverlayOffsets'] = injectToFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', function() {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
         // nothing
 
     });
 
     // No need to show or hide tittles and close buttons
-    windowOverlayInjections['showOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, 'showOverlay', false, function(animate) {
         if (!this._overlayEnabled)
             return;
 
@@ -215,7 +180,7 @@ function enable() {
     });
 
     // No need to show or hide tittles and close buttons
-    windowOverlayInjections['hideOverlay'] = overrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', function(animate) {
+    _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, 'hideOverlay', false, function(animate) {
         if (!this._overlayShown)
             return;
 
@@ -242,18 +207,23 @@ function enable() {
 }
 
 function disable() {
-    for (let functionName in windowOverlayInjections) {
-        removeInjection(WindowPreview.WindowPreview.prototype, windowOverlayInjections, functionName);
-    }
-
-    resetState();
-
     // Destroy the created object
     if (_settings) {
         // GObject.Object.run_dispose(): Releases all references to other objects.
         _settings.run_dispose();
         _settings = null;
     }
+
+    if (customWorkspace) {
+        customWorkspace.disable();
+        customWorkspace = null;
+    }
+
+    if (_objectPrototype) {
+        _objectPrototype.removeInjections(WindowPreview.WindowPreview.prototype);
+        _objectPrototype = null;
+    }
+
 }
 
 function init() {
