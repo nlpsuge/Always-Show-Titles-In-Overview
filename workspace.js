@@ -50,6 +50,7 @@ var CustomWorkspace = class {
 
         // Since other extensions (eg, dash-to-panel) could use Workspace.WorkspaceBackground, I can't just remove it any more.
         // Hide the Workspace.WorkspaceBackground after be initialized
+        // TODO seems that hiding _background is conflicked with Blur my Shell
         _objectPrototype.injectOrOverrideFunction(WorkspacesView.ExtraWorkspaceView.prototype, 'getActiveWorkspace', true, function() {
             // _showHideWorkspaceBackground(this);
 
