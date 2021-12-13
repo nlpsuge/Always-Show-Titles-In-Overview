@@ -11,6 +11,8 @@ var ObjectPrototype = class ObjectPrototype {
     
         objectPrototype[functionName] = function() {
             let returnValue;
+            print(this);
+            print(arguments);
     
             if (injected && originalFunction !== undefined) {
                 returnValue = originalFunction.apply(this, arguments);

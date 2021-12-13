@@ -50,8 +50,29 @@ var CustomWorkspace = class {
 
         // Since other extensions (eg, dash-to-panel) could use Workspace.WorkspaceBackground, I can't just remove it any more.
         // Hide the Workspace.WorkspaceBackground after be initialized
-        _objectPrototype.injectOrOverrideFunction(Workspace.WorkspaceBackground.prototype, '_init', true, function() {
-            _showHideWorkspaceBackground(this);
+        _objectPrototype.injectOrOverrideFunction(WorkspacesView.ExtraWorkspaceView.prototype, 'getActiveWorkspace', true, function() {
+            // _showHideWorkspaceBackground(this);
+
+            const hide_background = _settings.get_boolean('hide-background');
+            if (hide_background) {
+                this._workspace._background.hide();
+            } else {
+                this._workspace._background.show();
+            }
+            
+        });
+
+        _objectPrototype.injectOrOverrideFunction(WorkspacesView.WorkspacesView.prototype, '_updateWorkspaces', true, function() {
+            // _showHideWorkspaceBackground(this);
+
+            const hide_background = _settings.get_boolean('hide-background');
+            for (const _workspace in this._workspaces) {
+                if (hide_background) {
+                    _workspace._background.hide();
+                } else {
+                    _workspace._background.show();
+                }
+            }
         });
 
         _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, 'prepareToLeaveOverview', true, function() {
@@ -72,6 +93,7 @@ var CustomWorkspace = class {
 
         if (_objectPrototype) {
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
+            _objectPrototype.removeInjections(Workspace.WorkspaceBackground.prototype);
             _objectPrototype = null;
         }
     }
