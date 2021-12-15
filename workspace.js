@@ -67,7 +67,7 @@ var CustomWorkspace = class {
             // _showHideWorkspaceBackground(this);
 
             const hide_background = _settings.get_boolean('hide-background');
-            for (const _workspace in this._workspaces) {
+            for (const _workspace of this._workspaces) {
                 if (hide_background) {
                     _workspace._background.hide();
                 } else {
@@ -94,7 +94,8 @@ var CustomWorkspace = class {
 
         if (_objectPrototype) {
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
-            _objectPrototype.removeInjections(Workspace.WorkspaceBackground.prototype);
+            _objectPrototype.removeInjections(WorkspacesView.ExtraWorkspaceView.prototype);
+            _objectPrototype.removeInjections(WorkspacesView.WorkspacesView.prototype);
             _objectPrototype = null;
         }
     }
