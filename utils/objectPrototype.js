@@ -24,16 +24,23 @@ var ObjectPrototype = class ObjectPrototype {
             return returnValue;
         }
     
-        this.injections[functionName] = originalFunction;
+        this.injections[objectPrototype.constructor.name+':'+functionName] = originalFunction;
         return originalFunction;
     }
 
     removeInjections(objectPrototype) {
-        for (let functionName in this.injections) {
-            if (this.injections[functionName] === undefined) {
+        for (let prototypeFunctionName in this.injections) {
+            const functionNameArr = prototypeFunctionName.split(':');
+            const objectPrototypeName = functionNameArr[0];
+            if (objectPrototype.constructor.name !== objectPrototypeName) {
+                continue;
+            }
+
+            const functionName = functionNameArr[1];
+            if (this.injections[prototypeFunctionName] === undefined) {
                 delete objectPrototype[functionName];
             } else {
-                objectPrototype[functionName] = this.injections[functionName];
+                objectPrototype[functionName] = this.injections[prototypeFunctionName];
             }
         }
     }

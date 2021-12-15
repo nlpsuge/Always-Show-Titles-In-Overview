@@ -71,6 +71,7 @@ var CustomWorkspace = class {
         }
 
         if (_objectPrototype) {
+            _objectPrototype.removeInjections(Workspace.WorkspaceBackground.prototype);
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
             _objectPrototype = null;
         }
