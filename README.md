@@ -14,10 +14,21 @@ This a Gnome Shell extension, which shows titles of all window thumbnails in the
 Please read this post([Gnome 3.26: How to get the window titles in the activities view back?](https://www.reddit.com/r/gnome/comments/7dk1kb/gnome_326_how_to_get_the_window_titles_in_the/))
 and this comment below [Gnome Bugzilla - Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953).
 
-# Settings
-This extension has a Settings now, which makes it more powerful:
+# Features
+|Feature name|Default|
+|------------|-------|
+| Always show titles of all window thumbnails | - |
+| Always show close buttons of all window thumbnails | - |
+| Show or hide app icons | shown |
+| App icon position: Bottom, Center | Bottom|
+| Show or hide the app icon when a window is in fullscreen mode | hidden |
+| Tweak the window thumbnail active size increment (from 5 to 60) | 15 |
+| Show or hide the background | shown |
 
-![image](https://user-images.githubusercontent.com/2271720/142750014-4fb29ede-a8a7-4281-9e4b-2cddbb652266.png)
+# Settings
+This extension has a Settings now, which makes it more useful:
+
+![image](https://user-images.githubusercontent.com/2271720/146159735-62b2720f-dfa8-4626-8c1e-83349caa5edd.png)
 
 
 # TODO
