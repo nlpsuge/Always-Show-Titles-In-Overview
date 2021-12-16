@@ -23,7 +23,10 @@ function _showHideWorkspaceBackground(workspaceBackground) {
 }
 
 function _animateFromOverview(windowPreview, animate) {
-    if (!windowPreview._workspace.metaWorkspace.active) {
+    const metaWorkspace = windowPreview._workspace.metaWorkspace;
+    // Seems that if metaWorkspace is null, the current workspace is active
+    // See: Workspace._isMyWindow()
+    if (metaWorkspace !== null && !metaWorkspace.active) {
         return;
     }
     const toHide = [windowPreview._title, windowPreview._closeButton];
