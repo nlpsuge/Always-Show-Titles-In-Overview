@@ -23,7 +23,7 @@ function _showHideWorkspaceBackground(workspaceBackground) {
 }
 
 function _animateFromOverview(windowPreview, animate) {
-    if (!windowPreview._workspace.metaWorkspace.active) {
+    if (windowPreview._workspace.metaWorkspace == null || !windowPreview._workspace.metaWorkspace.active) {
         return;
     }
     const toHide = [windowPreview._title, windowPreview._closeButton];
