@@ -24,6 +24,7 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 | Show or hide the app icon when a window is in fullscreen mode | hidden |
 | Tweak the window thumbnail active size increment (from 5 to 60) | 15 |
 | Show or hide the background | shown |
+| Hide icons for video players, like SMPlayer | hidden |
 
 # Settings
 This extension has a Settings now, which makes it more useful:

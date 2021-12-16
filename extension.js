@@ -245,6 +245,10 @@ function disable() {
         _objectPrototype = null;
     }
 
+    if (windowTracker) {
+        windowTracker = null;
+    }
+
 }
 
 function init() {
