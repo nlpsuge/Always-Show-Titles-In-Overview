@@ -12,7 +12,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const WindowPreview = imports.ui.windowPreview;
-const { Clutter, St, Graphene } = imports.gi;
+const { Clutter, St, Graphene, Shell } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -29,6 +29,8 @@ let customWorkspace;
 
 let _objectPrototype; 
 
+let windowTracker;
+
 function _initializeObject() {
     _settings = ExtensionUtils.getSettings(
         'org.gnome.shell.extensions.always-show-titles-in-overview');
@@ -38,6 +40,7 @@ function _initializeObject() {
 
     _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
+    windowTracker = Shell.WindowTracker.get_default();
 }
 
 function _updateAppIconPosition(windowPreview) {
@@ -100,6 +103,24 @@ function _showOrHideAppIcon(windowPreview) {
         const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
         if (window_is_fullscreen) {
             windowPreview._icon.hide();
+        }
+    }
+
+    const hide_icon_for_video_player = _settings.get_boolean('hide-icon-for-video-player');
+    if (hide_icon_for_video_player) {
+        const app = windowTracker.get_window_app(windowPreview.metaWindow);
+        const app_info = app?.get_app_info();
+        // app_info can be null if backed by a window (like launched via command line, 
+        // not a .desktop file)
+        const categories = app_info?.get_categories();
+        if (categories) {
+            const categoriesArr = categories.split(';')
+            for (const category of categoriesArr) {
+                if (category === 'Video' || category === 'Player') {
+                    windowPreview._icon.hide();
+                    break;
+                }
+            }
         }
     }
 

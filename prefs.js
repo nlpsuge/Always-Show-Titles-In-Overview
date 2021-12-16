@@ -43,6 +43,13 @@ const Settings = GObject.registerClass({
             Gio.SettingsBindFlags.DEFAULT
         );
 
+        this._settings.bind(
+            'hide-icon-for-video-player',
+            this.hide_icon_for_video_player_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
         // GtkScale has no property named value, so we can not bind GtkScale.value,
 
         // Listen changes of window-active-size-inc, pass the changed value to GtkScale
@@ -86,7 +93,13 @@ const Settings = GObject.registerClass({
             log('do_not_show_app_icon_when_fullscreen_switch activate via lambda: ' + active);
             this._settings.set_boolean('do-not-show-app-icon-when-fullscreen', active);
         });
-        
+
+        this.hide_icon_for_video_player_switch = this._builder.get_object('hide_icon_for_video_player_switch');
+        this.hide_icon_for_video_player_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('hide-icon-for-video-player', active);
+        });
+
         this.window_active_size_inc_scale = this._builder.get_object('window_active_size_inc_scale');
         this.window_active_size_inc_scale.set_format_value_func((scale, value) => {
             return value + ' px';

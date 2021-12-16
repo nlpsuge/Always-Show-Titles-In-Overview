@@ -29,6 +29,15 @@
       playing video.
       </description>
     </key>
+    <key name="hide-icon-for-video-player" type="b">
+      <default>true</default>
+      <summary>Hide icons for video players, like SMPlayer</summary>
+      <description>
+      If an application is a video player, like VLC, SMPlayer, 
+      hide the app icons, which can no longer cover the video if who 
+      happens to preview videos in the Overview.
+      </description>
+    </key>
     <key name="window-active-size-inc" type="i">
       <default>15</default>
       <summary>Window active size increment, in pixels maybe ...</summary>
