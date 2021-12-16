@@ -1,4 +1,3 @@
-
 const { Clutter, St, GObject } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -24,8 +23,8 @@ function _showHideWorkspaceBackground(workspaceBackground) {
 
 function _animateFromOverview(windowPreview, animate) {
     const metaWorkspace = windowPreview._workspace.metaWorkspace;
-    // Seems that if metaWorkspace is null, the current workspace is active
-    // See: Workspace._isMyWindow()
+    // Seems that if metaWorkspace is null, the current workspace is active?
+    // See: workspace.Workspace#_isMyWindow() and workspacesView.SecondaryMonitorDisplay#_updateWorkspacesView()
     if (metaWorkspace !== null && !metaWorkspace.active) {
         return;
     }
