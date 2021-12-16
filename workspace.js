@@ -29,6 +29,9 @@ function _animateFromOverview(windowPreview, animate) {
     if (metaWorkspace !== null && !metaWorkspace.active) {
         return;
     }
+
+    // Hide title and button gradually even if metaWorkspace is null
+
     const toHide = [windowPreview._title, windowPreview._closeButton];
     toHide.forEach(a => {
         a.opacity = 255;
