@@ -17,9 +17,7 @@ const Settings = GObject.registerClass({
         
         
         const show_app_icon_switch_active = this._settings.get_boolean('show-app-icon');
-        this.position_bottom_button.set_sensitive(show_app_icon_switch_active);
-        this.position_middle_button.set_sensitive(show_app_icon_switch_active);
-        this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(show_app_icon_switch_active);
+        this._set_sensitive_for_show_app_icon_switch(show_app_icon_switch_active);
 
     }
 
@@ -32,7 +30,6 @@ const Settings = GObject.registerClass({
         );
 
         this._settings.connect('changed::app-icon-position', (settings) => {
-            log('app-icon-position changed: ' + settings.get_string('app-icon-position'));
             this._renderAppIconPosition();
         });
 
@@ -43,12 +40,18 @@ const Settings = GObject.registerClass({
             Gio.SettingsBindFlags.DEFAULT
         );
 
+        this._settings.bind(
+            'hide-icon-for-video-player',
+            this.hide_icon_for_video_player_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
         // GtkScale has no property named value, so we can not bind GtkScale.value,
 
         // Listen changes of window-active-size-inc, pass the changed value to GtkScale
         this._settings.connect('changed::window-active-size-inc', (settings) => {
             const window_active_size_inc_scale = settings.get_int('window-active-size-inc');
-            log('window-active-size-inc changed: ' + window_active_size_inc_scale);
             this.window_active_size_inc_scale.set_value(window_active_size_inc_scale);
         });
 
@@ -70,12 +73,8 @@ const Settings = GObject.registerClass({
         this.show_app_icon_switch = this._builder.get_object('show_app_icon_switch');
         this.show_app_icon_switch.connect('notify::active', (widget) => {
             const active = widget.active;
-            log('show_app_icon_switch activate via lambda: ' + active);
             this._settings.set_boolean('show-app-icon', active);
-
-            this.position_bottom_button.set_sensitive(active);
-            this.position_middle_button.set_sensitive(active);
-            this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(active);
+            this._set_sensitive_for_show_app_icon_switch(active);
         });
 
         this._renderAppIconPosition();
@@ -83,10 +82,15 @@ const Settings = GObject.registerClass({
         this.do_not_show_app_icon_when_fullscreen_switch = this._builder.get_object('do_not_show_app_icon_when_fullscreen_switch');
         this.do_not_show_app_icon_when_fullscreen_switch.connect('notify::active', (widget) => {
             const active = widget.active;
-            log('do_not_show_app_icon_when_fullscreen_switch activate via lambda: ' + active);
             this._settings.set_boolean('do-not-show-app-icon-when-fullscreen', active);
         });
-        
+
+        this.hide_icon_for_video_player_switch = this._builder.get_object('hide_icon_for_video_player_switch');
+        this.hide_icon_for_video_player_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('hide-icon-for-video-player', active);
+        });
+
         this.window_active_size_inc_scale = this._builder.get_object('window_active_size_inc_scale');
         this.window_active_size_inc_scale.set_format_value_func((scale, value) => {
             return value + ' px';
@@ -104,12 +108,18 @@ const Settings = GObject.registerClass({
         // Listen changes of window_active_size_inc_scale, pass the changed value to Gio.Gsettings
         this.window_active_size_inc_scale.connect('value-changed', (scale) => {
             const value = scale.get_value();
-            log('The current value is: ' + value);
             this._settings.set_int('window-active-size-inc', value);
         });
 
         this.hide_background_switch = this._builder.get_object('hide_background_switch');
 
+    }
+
+    _set_sensitive_for_show_app_icon_switch(show_app_icon_switch_active) {
+        this.position_bottom_button.set_sensitive(show_app_icon_switch_active);
+        this.position_middle_button.set_sensitive(show_app_icon_switch_active);
+        this.do_not_show_app_icon_when_fullscreen_switch.set_sensitive(show_app_icon_switch_active);
+        this.hide_icon_for_video_player_switch.set_sensitive(show_app_icon_switch_active);
     }
 
     _renderAppIconPosition() {
@@ -148,12 +158,10 @@ const BuilderScope = GObject.registerClass({
     }
 
     position_bottom_button_clicked_cb(button) {
-        log('bottom button clicked: ' + button.get_active());
         this._preferences._settings.set_string('app-icon-position', 'Bottom');
     }
 
     position_middle_button_clicked_cb(button) {
-        log('middle button clicked: ' + button.get_active());
         this._preferences._settings.set_string('app-icon-position', 'Center');
     }
 });

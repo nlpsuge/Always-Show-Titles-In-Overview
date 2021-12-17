@@ -179,7 +179,7 @@
                             <child>
                               <object class="GtkLabel" id="do_not_show_app_icon_when_fullscreen_label">
                                 <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Don&apos;t show the app icon when fullscreen</property>
+                                <property name="label" translatable="yes">Hide icons when fullscreen</property>
                                 <property name="use-markup">1</property>
                                 <property name="xalign">0</property>
                                 <layout>
@@ -220,6 +220,42 @@
                             </child>
                             <child>
                               <placeholder/>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow" id="hide_icon_for_video_player_row">
+                        <property name="focusable">1</property>
+                        <property name="child">
+                          <object class="GtkGrid" id="hide_icon_for_video_player_grid">
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <property name="row-spacing">6</property>
+                            <property name="column-spacing">32</property>
+                            <child>
+                              <object class="GtkLabel" id="hide_icon_for_video_player_label">
+                                <property name="hexpand">1</property>
+                                <property name="label" translatable="yes">Hide icons for video/TV players, like SMPlayer</property>
+                                <property name="xalign">0</property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="hide_icon_for_video_player_switch">
+                                <property name="focusable">1</property>
+                                <property name="halign">end</property>
+                                <property name="valign">center</property>
+                                <property name="active">1</property>
+                                <layout>
+                                  <property name="column">1</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
                             </child>
                           </object>
                         </property>
