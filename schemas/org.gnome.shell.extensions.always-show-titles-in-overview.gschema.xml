@@ -22,7 +22,7 @@
     </key>
     <key name="do-not-show-app-icon-when-fullscreen" type="b">
       <default>true</default>
-      <summary>Don't show the app icon when fullscreen</summary>
+      <summary>Hide icons when fullscreen</summary>
       <description>
       If a window is in fullscreen mode, like playing video in Firefox,
       do not show the app icon on the overlay. Because it could cover the 
