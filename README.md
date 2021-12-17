@@ -22,14 +22,14 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 | Show or hide app icons | shown |
 | App icon position: Bottom, Center | Bottom|
 | Show or hide the app icon when a window is in fullscreen mode | hidden |
+| Hide icons for Video/TV players, like SMPlayer | hidden |
 | Tweak the window thumbnail active size increment (from 5 to 60) | 15 |
 | Show or hide the background | shown |
-| Hide icons for Video/TV players, like SMPlayer | hidden |
 
 # Settings
 This extension has a Settings now, which makes it more useful:
 
-![image](https://user-images.githubusercontent.com/2271720/146159735-62b2720f-dfa8-4626-8c1e-83349caa5edd.png)
+![image](https://user-images.githubusercontent.com/2271720/146554573-4026afbc-a118-4899-87de-e8cee4e818af.png)
 
 
 # TODO
