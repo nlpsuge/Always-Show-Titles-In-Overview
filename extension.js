@@ -152,7 +152,7 @@ function _showOrHideAppIcon(windowPreview) {
 function enable() {
     _initializeObject();
 
-    // WindowPreview._init () is called N times if there are N windows when avtive the Overview
+    // WindowPreview._init () is called N times if there are N windows when activate the Overview
     // Always show titles and close buttons
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_init', true, function(animate) {
         const toShow = this._windowCanClose()
