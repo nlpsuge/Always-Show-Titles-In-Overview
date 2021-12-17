@@ -110,8 +110,8 @@ function _showOrHideAppIcon(windowPreview) {
     if (hide_icon_for_video_player) {
         const app = windowTracker.get_window_app(windowPreview.metaWindow);
         const app_info = app?.get_app_info();
-        // app_info can be null if backed by a window (like launched via command line, 
-        // not a .desktop file)
+        // app_info can be null if backed by a window (there's no .desktop file association)
+        // See: shell_app_is_window_backed()
         const categories = app_info?.get_categories();
         if (categories) {
             const categoriesArr = categories.split(';')
