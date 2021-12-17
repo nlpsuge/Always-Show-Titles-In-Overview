@@ -103,6 +103,7 @@ function _showOrHideAppIcon(windowPreview) {
         const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
         if (window_is_fullscreen) {
             windowPreview._icon.hide();
+            return;
         }
     }
 
@@ -112,13 +113,34 @@ function _showOrHideAppIcon(windowPreview) {
         const app_info = app?.get_app_info();
         // app_info can be null if backed by a window (there's no .desktop file association)
         // See: shell_app_is_window_backed()
+        let recheck = false;
         const categories = app_info?.get_categories();
         if (categories) {
             const categoriesArr = categories.split(';')
             for (const category of categoriesArr) {
-                if (category === 'Video' || category === 'Player' || category === 'TV') {
+                // Support Video and TV
+                if (category === 'Video' || category === 'TV') {
                     windowPreview._icon.hide();
-                    break;
+                    return;
+                } 
+                
+                // Support Video and Audio
+                if (category === 'Player') {
+                    recheck = true;
+                }
+            }
+        }
+
+        if (recheck) {
+            log('Rechecking whether ' + app_info?.get_name() + ' is a video player or not by checking mime type');
+            const supported_types = app_info?.get_supported_types();
+            if (supported_types) {
+                for (const supported_type of supported_types) {
+                    // Support Video
+                    if (supported_type.startsWith('video/')) {
+                        windowPreview._icon.hide();
+                        return;
+                    }
                 }
             }
         }
