@@ -237,7 +237,7 @@
                             <child>
                               <object class="GtkLabel" id="hide_icon_for_video_player_label">
                                 <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Hide icons for video players, like SMPlayer</property>
+                                <property name="label" translatable="yes">Hide icons for video/TV players, like SMPlayer</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>

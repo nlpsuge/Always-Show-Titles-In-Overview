@@ -31,9 +31,9 @@
     </key>
     <key name="hide-icon-for-video-player" type="b">
       <default>true</default>
-      <summary>Hide icons for video players, like SMPlayer</summary>
+      <summary>Hide icons for video/TV players, like SMPlayer</summary>
       <description>
-      If an application is a video player, like VLC, SMPlayer, 
+      If an application is a video/TV player, like VLC, SMPlayer, 
       hide the app icons, which can no longer cover the video if who 
       happens to preview videos in the Overview.
       </description>

@@ -116,7 +116,7 @@ function _showOrHideAppIcon(windowPreview) {
         if (categories) {
             const categoriesArr = categories.split(';')
             for (const category of categoriesArr) {
-                if (category === 'Video' || category === 'Player') {
+                if (category === 'Video' || category === 'Player' || category === 'TV') {
                     windowPreview._icon.hide();
                     break;
                 }
