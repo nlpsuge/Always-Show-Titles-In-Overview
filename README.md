@@ -19,12 +19,12 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 |------------|-------|
 | Always show titles of all window thumbnails | - |
 | Always show close buttons of all window thumbnails | - |
-| Show or hide app icons | shown |
-| App icon position: Bottom, Center | Bottom|
-| Show or hide the app icon when a window is in fullscreen mode | hidden |
-| Hide icons for Video/TV players, like SMPlayer | hidden |
+| Show app icons | on |
+| App icon position (Bottom, Center) | Bottom |
+| Hide icons when fullscreen | on |
+| Hide icons for Video/TV players, like SMPlayer | on |
 | Tweak the window thumbnail active size increment (from 5 to 60) | 15 |
-| Show or hide the background | shown |
+| Hide the background | off |
 
 # Settings
 This extension has a Settings now, which makes it more useful:
