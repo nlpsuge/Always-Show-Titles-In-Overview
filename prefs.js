@@ -1,3 +1,5 @@
+'use strict';
+
 const { Gtk, GObject, Gio } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();

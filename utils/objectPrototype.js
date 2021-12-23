@@ -1,3 +1,5 @@
+'use strict';
+
 /* exported ObjectPrototype */
 
 var ObjectPrototype = class ObjectPrototype {
