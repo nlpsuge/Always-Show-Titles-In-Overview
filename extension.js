@@ -91,9 +91,47 @@ function _updateAppIconPosition(windowPreview) {
     }
 }
 
+function _showOrHideTitle(windowPreview) {
+    const icon_constraints = windowPreview._title.get_constraints();
+    let icon_factor = 0.5;
+    for (const constraint of icon_constraints) {
+        if (constraint instanceof Clutter.AlignConstraint) {
+            const align_axis = constraint.align_axis;
+            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                // 0(top), 0.5(middle), 1(bottom)
+                constraint.set_factor(icon_factor);
+            }
+
+        }
+
+        // Move title lower half of the hight of the title, so that the icon will not cover it
+        if (constraint instanceof Clutter.BindConstraint) {
+            windowPreview.connect('notify::realized', () => {
+                if (!windowPreview.realized) {
+                    return;
+                }
+
+                let titleOffset;
+                const show_app_icon = _settings.get_boolean('show-app-icon');
+                if (show_app_icon) {
+                    titleOffset = windowPreview._title.height / 2;
+                } else {
+                    titleOffset = -windowPreview._title.height;
+                }
+
+                constraint.set_coordinate(Clutter.BindCoordinate.Y);
+                constraint.set_offset(titleOffset);
+
+                windowPreview._title.ensure_style();
+                windowPreview._icon.ensure_style();
+            });
+        }
+    }
+
+}
 function _showOrHideAppIcon(windowPreview) {
     // show or hide all app icons
-    const show_app_icon =  _settings.get_boolean('show-app-icon');
+    const show_app_icon = _settings.get_boolean('show-app-icon');
     if (!show_app_icon) {
         windowPreview._icon.hide();
         return;
@@ -179,6 +217,8 @@ function enable() {
         }
 
         _showOrHideAppIcon(this);
+
+        _showOrHideTitle(this);
     });
 
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
