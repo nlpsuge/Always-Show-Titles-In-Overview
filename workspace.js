@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, St, GObject, GLib } = imports.gi;
+const { Clutter, St, GObject } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const WorkspacesView = imports.ui.workspacesView;
@@ -13,8 +13,7 @@ const ObjectPrototype = Me.imports.utils.objectPrototype;
 const WINDOW_OVERLAY_FADE_TIME = 200;
 let _settings;
 let _objectPrototype;
-let _appsGridShownId;
-let _idleId;
+let _appsGridShownIds = new Set();
 
 function _showHideWorkspaceBackground(workspaceBackground) {
     const hide_background = _settings.get_boolean('hide-background');
@@ -46,39 +45,25 @@ function _animateFromOverview(windowPreview, animate) {
     });
 }
 
-// TODO　better to hide the titles and close buttons before entering the app grid,
-// otherwise the titles and close buttons on windows are very noticeable. 
-function _removeWindowDecorations() {
-    _appsGridShownId = Main.overview.dash.showAppsButton.connect('notify::checked', () => {
-        // Have to do this when the event loop is idle and to wait the underlying higher priority operations are completed
-        _idleId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
-            // monitors
-            const workspacesViews = Main.overview._overview._controls._workspacesDisplay._workspacesViews;
-            if (workspacesViews && workspacesViews.length) {
-                workspacesViews.forEach(wv => {
-                    const workspaces = wv._workspaces;
-                    // It's possible no workspace view bars on the second monitor
-                    if (workspaces && workspaces.length) {
-                        workspaces.forEach(workspace => {
-                            const windows = workspace._windows;
-                            if (windows.length) {
-                                windows.forEach(window => {
-                                    window._closeButton.hide();
-                                    window._title.hide();
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
+function _removeWindowDecorations(workspace) {
+    let appsGridShownId = Main.overview.dash.showAppsButton.connect('notify::checked', () => {
+        const windows = workspace._windows;
+        if (windows.length) {
+            windows.forEach(window => {
+                window._closeButton.hide();
+                window._title.hide();
+            });
+        }
+        Main.overview.dash.showAppsButton.disconnect(appsGridShownId);
+        _appsGridShownIds.delete(appsGridShownId);
     });
+    _appsGridShownIds.add(appsGridShownId);
 }
 
 var CustomWorkspace = class {
 
     constructor() {
-        _removeWindowDecorations();
+
     }
 
     enable() {
@@ -90,6 +75,10 @@ var CustomWorkspace = class {
         // Hide the Workspace.WorkspaceBackground after be initialized
         _objectPrototype.injectOrOverrideFunction(Workspace.WorkspaceBackground.prototype, '_init', true, function() {
             _showHideWorkspaceBackground(this);
+        });
+
+        _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, '_init', true, function(metaWorkspace, monitorIndex, overviewAdjustment) {
+            _removeWindowDecorations(this);
         });
 
         _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, 'prepareToLeaveOverview', true, function() {
@@ -114,14 +103,12 @@ var CustomWorkspace = class {
             _objectPrototype = null;
         }
 
-        if (_appsGridShownId) {
-            Main.overview.dash.showAppsButton.disconnect(_appsGridShownId);
-            _appsGridShownId = null;
-        }
-
-        if (_idleId) {
-            GLib.source_remove(_idleId);
-            _idleId = null;
+        if (_appsGridShownIds && _appsGridShownIds.size) {
+            _appsGridShownIds.forEach(appsGridShownId => {
+                Main.overview.dash.showAppsButton.disconnect(appsGridShownId);
+            });
+            _appsGridShownIds.clear();
+            _appsGridShownIds = null;
         }
     }
 
