@@ -13,7 +13,6 @@ const ObjectPrototype = Me.imports.utils.objectPrototype;
 const WINDOW_OVERLAY_FADE_TIME = 200;
 let _settings;
 let _objectPrototype;
-let _appsGridShownIds = new Set();
 
 function _showHideWorkspaceBackground(workspaceBackground) {
     const hide_background = _settings.get_boolean('hide-background');
@@ -45,21 +44,6 @@ function _animateFromOverview(windowPreview, animate) {
     });
 }
 
-function _removeWindowDecorations(workspace) {
-    let appsGridShownId = Main.overview.dash.showAppsButton.connect('notify::checked', () => {
-        const windows = workspace._windows;
-        if (windows.length) {
-            windows.forEach(window => {
-                window._closeButton.hide();
-                window._title.hide();
-            });
-        }
-        Main.overview.dash.showAppsButton.disconnect(appsGridShownId);
-        _appsGridShownIds.delete(appsGridShownId);
-    });
-    _appsGridShownIds.add(appsGridShownId);
-}
-
 var CustomWorkspace = class {
 
     constructor() {
@@ -75,10 +59,6 @@ var CustomWorkspace = class {
         // Hide the Workspace.WorkspaceBackground after be initialized
         _objectPrototype.injectOrOverrideFunction(Workspace.WorkspaceBackground.prototype, '_init', true, function() {
             _showHideWorkspaceBackground(this);
-        });
-
-        _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, '_init', true, function(metaWorkspace, monitorIndex, overviewAdjustment) {
-            _removeWindowDecorations(this);
         });
 
         _objectPrototype.injectOrOverrideFunction(Workspace.Workspace.prototype, 'prepareToLeaveOverview', true, function() {
@@ -101,14 +81,6 @@ var CustomWorkspace = class {
             _objectPrototype.removeInjections(Workspace.WorkspaceBackground.prototype);
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
             _objectPrototype = null;
-        }
-
-        if (_appsGridShownIds && _appsGridShownIds.size) {
-            _appsGridShownIds.forEach(appsGridShownId => {
-                Main.overview.dash.showAppsButton.disconnect(appsGridShownId);
-            });
-            _appsGridShownIds.clear();
-            _appsGridShownIds = null;
         }
     }
 
