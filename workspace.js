@@ -77,6 +77,7 @@ function _removeWindowDecorations() {
                         }
                     });
                 }
+                return GLib.SOURCE_REMOVE;
             });
         } else {
             _restoreWindowsVisible();

@@ -49,6 +49,24 @@ const Settings = GObject.registerClass({
             Gio.SettingsBindFlags.DEFAULT
         );
 
+        this._settings.connect('changed::window-title-position', (settings) => {
+            this._renderWindowTitlePosition();
+        });
+
+        this._settings.bind(
+            'do-not-show-window-title-when-fullscreen',
+            this.do_not_show_window_title_when_fullscreen_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        this._settings.bind(
+            'hide-window-title-for-video-player',
+            this.hide_window_titles_for_video_player_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
         // GtkScale has no property named value, so we can not bind GtkScale.value,
 
         // Listen changes of window-active-size-inc, pass the changed value to GtkScale
@@ -77,6 +95,20 @@ const Settings = GObject.registerClass({
             const active = widget.active;
             this._settings.set_boolean('show-app-icon', active);
             this._set_sensitive_for_show_app_icon_switch(active);
+        });
+
+        this._renderWindowTitlePosition();
+
+        this.do_not_show_window_title_when_fullscreen_switch = this._builder.get_object('do_not_show_window_title_when_fullscreen_switch');
+        this.do_not_show_window_title_when_fullscreen_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('do-not-show-window-title-when-fullscreen', active);
+        });
+
+        this.hide_window_titles_for_video_player_switch = this._builder.get_object('hide_window_titles_for_video_player_switch');
+        this.hide_window_titles_for_video_player_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('hide-window-title-for-video-player', active);
         });
 
         this._renderAppIconPosition();
@@ -136,6 +168,17 @@ const Settings = GObject.registerClass({
         }
     }
 
+    _renderWindowTitlePosition() {
+        this.window_title_position_middle_button = this._builder.get_object('window_title_position_middle_button');
+        this.window_title_position_bottom_button = this._builder.get_object('window_title_position_bottom_button');
+        this.window_title_position = this._settings.get_string('window-title-position');
+        if (this.window_title_position === 'Center') {
+            this.window_title_position_middle_button.set_active(true);
+        }
+        else {
+            this.window_title_position_bottom_button.set_active(true);
+        }
+    }
 });
 
 const BuilderScope = GObject.registerClass({
@@ -165,6 +208,14 @@ const BuilderScope = GObject.registerClass({
 
     position_middle_button_clicked_cb(button) {
         this._preferences._settings.set_string('app-icon-position', 'Center');
+    }
+
+    window_title_position_bottom_button_clicked_cb(button) {
+        this._preferences._settings.set_string('window-title-position', 'Bottom');
+    }
+
+    window_title_position_middle_button_clicked_cb(button) {
+        this._preferences._settings.set_string('window-title-position', 'Center');
     }
 });
 

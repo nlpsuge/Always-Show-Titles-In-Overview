@@ -14,7 +14,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 const WindowPreview = imports.ui.windowPreview;
-const { Clutter, St, Graphene, Shell } = imports.gi;
+const { Clutter, St, Graphene, Shell, GLib } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -26,12 +26,10 @@ let windowOverlayInjections;
 var WINDOW_SCALE_TIME = 200;
 
 let _settings = null;
-
 let customWorkspace;
-
 let _objectPrototype; 
-
 let windowTracker;
+let _idleId;
 
 function _initializeObject() {
     _settings = ExtensionUtils.getSettings(
@@ -45,110 +43,16 @@ function _initializeObject() {
     windowTracker = Shell.WindowTracker.get_default();
 }
 
-function _updateAppIconPosition(windowPreview) {
-    const app_icon_position = _settings.get_string('app-icon-position');
-    let icon_factor = 1;
-    if (app_icon_position === 'Center') {
-        icon_factor = 0.5
-    }
-
-    const icon_constraints = windowPreview._icon.get_constraints();
-    for (const constraint of icon_constraints) {
-        if (constraint instanceof Clutter.AlignConstraint) {
-            const align_axis = constraint.align_axis;
-            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
-                // 0(top), 0.5(middle), 1(bottom)
-                constraint.set_factor(icon_factor);
-            }
-        }
-
-        // Change to coordinate to Clutter.BindCoordinate.Y
-        // And set offset to make the icon be up a bit
-        // And only when the icon is on the bottom needs to do this code block
-        if (app_icon_position === 'Bottom') {
-            if (!constraint instanceof Clutter.BindConstraint) {
-                continue;
-            }
-            const coordinate = constraint.coordinate
-            if (coordinate !== Clutter.BindCoordinate.POSITION) {
-                continue;
-            }
-
-            // Change icon's constraint in notify::realized,
-            // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
-            windowPreview.connect('notify::realized', () => {
-                if (!windowPreview.realized) {
-                    return;
-                }
-
-                constraint.set_coordinate(Clutter.BindCoordinate.Y);
-                constraint.set_offset(-windowPreview._title.height / 2);
-
-                windowPreview._title.ensure_style();
-                windowPreview._icon.ensure_style();
-            });
-        }
-    }
-}
-
-function _showOrHideTitle(windowPreview) {
-    const icon_constraints = windowPreview._title.get_constraints();
-    let icon_factor = 0.5;
-    for (const constraint of icon_constraints) {
-        if (constraint instanceof Clutter.AlignConstraint) {
-            const align_axis = constraint.align_axis;
-            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
-                // 0(top), 0.5(middle), 1(bottom)
-                constraint.set_factor(icon_factor);
-            }
-
-        }
-
-        // Move title lower half of the hight of the title, so that the icon will not cover it
-        if (constraint instanceof Clutter.BindConstraint) {
-            windowPreview.connect('notify::realized', () => {
-                if (!windowPreview.realized) {
-                    return;
-                }
-
-                let titleOffset;
-                const show_app_icon = _settings.get_boolean('show-app-icon');
-                if (show_app_icon) {
-                    titleOffset = windowPreview._title.height / 2;
-                } else {
-                    titleOffset = -windowPreview._title.height;
-                }
-
-                constraint.set_coordinate(Clutter.BindCoordinate.Y);
-                constraint.set_offset(titleOffset);
-
-                windowPreview._title.ensure_style();
-                windowPreview._icon.ensure_style();
-            });
-        }
-    }
-
-}
-function _showOrHideAppIcon(windowPreview) {
-    // show or hide all app icons
-    const show_app_icon = _settings.get_boolean('show-app-icon');
-    if (!show_app_icon) {
-        windowPreview._icon.hide();
-        return;
-    }
-
-    // show or hide some app icons
-    const do_not_show_app_icon_when_fullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
-    if (do_not_show_app_icon_when_fullscreen) {
+function _hideActor(windowPreview, actor, showOrHideWhenFullscreen, showOrHideForVideoPlayer) {
+    if (showOrHideWhenFullscreen) {
         const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
         if (window_is_fullscreen) {
-            windowPreview._icon.hide();
+            actor.hide();
             return;
         }
     }
 
-    const hide_icon_for_video_player = _settings.get_boolean('hide-icon-for-video-player');
-    if (hide_icon_for_video_player) {
+    if (showOrHideForVideoPlayer) {
         const app = windowTracker.get_window_app(windowPreview.metaWindow);
         const app_info = app?.get_app_info();
         // app_info can be null if backed by a window (there's no .desktop file association)
@@ -160,7 +64,7 @@ function _showOrHideAppIcon(windowPreview) {
             for (const category of categoriesArr) {
                 // Support Video and TV
                 if (category === 'Video' || category === 'TV') {
-                    windowPreview._icon.hide();
+                    actor.hide();
                     return;
                 } 
                 
@@ -178,15 +82,87 @@ function _showOrHideAppIcon(windowPreview) {
                 for (const supported_type of supported_types) {
                     // Support Video
                     if (supported_type.startsWith('video/')) {
-                        windowPreview._icon.hide();
+                        actor.hide();
                         return;
                     }
                 }
             }
         }
     }
+}
 
-    _updateAppIconPosition(windowPreview);
+function _updatePosition(windowPreview, constraints, position, offset) {
+    let factor = 1;
+    if (position === 'Center') {
+        factor = 0.5
+    }
+
+    for (const constraint of constraints) {
+        if (constraint instanceof Clutter.AlignConstraint) {
+            const align_axis = constraint.align_axis;
+            if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                // 0(top), 0.5(middle), 1(bottom)
+                constraint.set_factor(factor);
+            }
+        }
+
+        // Change to coordinate to Clutter.BindCoordinate.Y
+        // And set offset to make the icon be up a bit
+        // And only when the icon is on the bottom needs to do this code block
+        if (offset) {
+            if (!constraint instanceof Clutter.BindConstraint) {
+                continue;
+            }
+            const coordinate = constraint.coordinate
+            if (coordinate !== Clutter.BindCoordinate.POSITION) {
+                continue;
+            }
+
+            // Change icon's constraint in notify::realized,
+            // to fix 'st_widget_get_theme_node called on the widget [0x5g869999 StLabel.window-caption ("a title name")] which is not in the stage.'
+            windowPreview.connect('notify::realized', () => {
+                if (!windowPreview.realized) {
+                    return;
+                }
+
+                constraint.set_coordinate(Clutter.BindCoordinate.Y);
+                constraint.set_offset(offset());
+
+                windowPreview._title.ensure_style();
+                windowPreview._icon.ensure_style();
+            });
+        }
+    }
+}
+
+function _updateTitle(windowPreview) {
+    const showOrHideWhenFullscreen = _settings.get_boolean('do-not-show-window-title-when-fullscreen');
+    const showOrHideForVideoPlayer = _settings.get_boolean('hide-window-title-for-video-player');
+    _hideActor(windowPreview, windowPreview._title, showOrHideWhenFullscreen, showOrHideForVideoPlayer);
+
+    const titleConstraints = windowPreview._title.get_constraints();
+    const windowTitlePosition = _settings.get_string('window-title-position');
+    _updatePosition(windowPreview, titleConstraints, windowTitlePosition, null);    
+}
+
+function _updateAppIcon(windowPreview) {
+    // show or hide all app icons
+    const show_app_icon =  _settings.get_boolean('show-app-icon');
+    if (!show_app_icon) {
+        windowPreview._icon.hide();
+        return;
+    }
+
+    const showOrHideWhenFullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
+    const showOrHideForVideoPlayer = _settings.get_boolean('hide-icon-for-video-player');
+    _hideActor(windowPreview, windowPreview._icon, showOrHideWhenFullscreen, showOrHideForVideoPlayer);
+
+    const iconConstraints = windowPreview._icon.get_constraints();
+    const appIconPosition = _settings.get_string('app-icon-position');
+
+    // Note: when `offset` is negative, the `_icon` moves upwards.
+    let offset = () => -windowPreview._title.height / 2;
+    _updatePosition(windowPreview, iconConstraints, appIconPosition, offset);
 }
 
 function enable() {
@@ -216,9 +192,9 @@ function enable() {
             }
         }
 
-        _showOrHideAppIcon(this);
+        _updateAppIcon(this);
+        _updateTitle(this);
 
-        _showOrHideTitle(this);
     });
 
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
@@ -311,6 +287,11 @@ function disable() {
 
     if (windowTracker) {
         windowTracker = null;
+    }
+
+    if (_idleId) {
+        GLib.source_remove(_idleId);
+        _idleId = null;
     }
 
 }

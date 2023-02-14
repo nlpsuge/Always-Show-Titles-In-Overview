@@ -4,7 +4,36 @@
     <value value='0' nick='Bottom'/>
     <value value='1' nick='Center'/>
   </enum>
+  <enum id='org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position'>
+    <value value='0' nick='Bottom'/>
+    <value value='1' nick='Center'/>
+  </enum>
   <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
+  <key name="window-title-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position">
+      <default>'Bottom'</default>
+      <summary>Window title position</summary>
+      <description>
+      Window title position, supporting 'Bottom', 'Center'. 
+      Default is 'Bottom'.
+      </description>
+    </key>
+    <key name="do-not-show-window-title-when-fullscreen" type="b">
+      <default>true</default>
+      <summary>Hide window titles when fullscreen</summary>
+      <description>
+      If a window is in fullscreen mode, like playing video in Firefox,
+      do not show the window titles on the overlay. Because it could cover the 
+      playing video.
+      </description>
+    </key>
+    <key name="hide-window-title-for-video-player" type="b">
+      <default>true</default>
+      <summary>Hide window titles for video/TV players, like SMPlayer</summary>
+      <description>
+      If an application is a video/TV player, like VLC, SMPlayer, 
+      hide the window titles, which can no longer cover the videos in the Overview.
+      </description>
+    </key>
     <key name="show-app-icon" type="b">
       <default>true</default>
       <summary>Show app icons in the Overview</summary>
@@ -34,8 +63,7 @@
       <summary>Hide icons for video/TV players, like SMPlayer</summary>
       <description>
       If an application is a video/TV player, like VLC, SMPlayer, 
-      hide the app icons, which can no longer cover the video if who 
-      happens to preview videos in the Overview.
+      hide the app icons, which can no longer cover the videos in the Overview.
       </description>
     </key>
     <key name="window-active-size-inc" type="i">
