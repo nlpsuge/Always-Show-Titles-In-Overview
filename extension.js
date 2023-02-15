@@ -114,6 +114,7 @@ function _updatePosition(windowPreview, constraints, position, offset) {
                 continue;
             }
             const coordinate = constraint.coordinate
+            // Note that `windowPreview._title` does not have `Clutter.BindCoordinate.POSITION` constraint, but it has `Clutter.BindCoordinate.Y` constraint, as well as `windowPreview._icon`
             if (coordinate !== Clutter.BindCoordinate.POSITION) {
                 continue;
             }

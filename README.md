@@ -1,6 +1,6 @@
-<h1> Customize Overview (Always-Show-Titles-In-Overview) </h1>
+<h1>Always-Show-Titles-In-Overview</h1>
 
-This a Gnome Shell extension, which customizes the Overview, including always showing titles of all window thumbnails.
+This a Gnome Shell extension, which customizes the Overview, including always showing titles of all window thumbnails and setting the position of icons and titles, etc.
 
 <p align="left">
   <a href="https://extensions.gnome.org/extension/1689/always-show-titles-in-overview/">
