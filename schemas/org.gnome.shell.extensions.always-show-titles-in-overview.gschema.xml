@@ -17,21 +17,21 @@
       Default is 'Bottom'.
       </description>
     </key>
-    <key name="do-not-show-window-title-when-fullscreen" type="b">
+    <key name="move-window-title-to-bottom-when-fullscreen" type="b">
       <default>true</default>
-      <summary>Hide window titles when fullscreen</summary>
+      <summary>Move window titles to the bottom when fullscreen</summary>
       <description>
       If a window is in fullscreen mode, like playing video in Firefox,
-      do not show the window titles on the overlay. Because it could cover the 
-      playing video.
+      move the window titles to the buttom to avoid covering the 
+      playing videos in the Overview.
       </description>
     </key>
-    <key name="hide-window-title-for-video-player" type="b">
+    <key name="move-window-title-to-bottom-for-video-player" type="b">
       <default>true</default>
-      <summary>Hide window titles for video/TV players, like SMPlayer</summary>
+      <summary>Move window titles to the bottom for video/TV players, like SMPlayer</summary>
       <description>
       If an application is a video/TV player, like VLC, SMPlayer, 
-      hide the window titles, which can no longer cover the videos in the Overview.
+      move window titles to the bottom to avoid covering the videos in the Overview.
       </description>
     </key>
     <key name="show-app-icon" type="b">

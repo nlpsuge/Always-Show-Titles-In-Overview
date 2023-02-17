@@ -54,15 +54,15 @@ const Settings = GObject.registerClass({
         });
 
         this._settings.bind(
-            'do-not-show-window-title-when-fullscreen',
-            this.do_not_show_window_title_when_fullscreen_switch,
+            'move-window-title-to-bottom-when-fullscreen',
+            this.move_window_title_to_bottom_when_fullscreen_switch,
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
 
         this._settings.bind(
-            'hide-window-title-for-video-player',
-            this.hide_window_titles_for_video_player_switch,
+            'move-window-title-to-bottom-for-video-player',
+            this.move_window_title_to_bottom_for_video_player_switch,
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
@@ -99,16 +99,16 @@ const Settings = GObject.registerClass({
 
         this._renderWindowTitlePosition();
 
-        this.do_not_show_window_title_when_fullscreen_switch = this._builder.get_object('do_not_show_window_title_when_fullscreen_switch');
-        this.do_not_show_window_title_when_fullscreen_switch.connect('notify::active', (widget) => {
+        this.move_window_title_to_bottom_when_fullscreen_switch = this._builder.get_object('move_window_title_to_bottom_when_fullscreen_switch');
+        this.move_window_title_to_bottom_when_fullscreen_switch.connect('notify::active', (widget) => {
             const active = widget.active;
-            this._settings.set_boolean('do-not-show-window-title-when-fullscreen', active);
+            this._settings.set_boolean('move-window-title-to-bottom-when-fullscreen', active);
         });
 
-        this.hide_window_titles_for_video_player_switch = this._builder.get_object('hide_window_titles_for_video_player_switch');
-        this.hide_window_titles_for_video_player_switch.connect('notify::active', (widget) => {
+        this.move_window_title_to_bottom_for_video_player_switch = this._builder.get_object('move_window_title_to_bottom_for_video_player_switch');
+        this.move_window_title_to_bottom_for_video_player_switch.connect('notify::active', (widget) => {
             const active = widget.active;
-            this._settings.set_boolean('hide-window-title-for-video-player', active);
+            this._settings.set_boolean('move-window-title-to-bottom-for-video-player', active);
         });
 
         this._renderAppIconPosition();

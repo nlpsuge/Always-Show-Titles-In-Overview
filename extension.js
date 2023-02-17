@@ -31,6 +31,19 @@ let _objectPrototype;
 let windowTracker;
 let _idleId;
 
+let allUpdateWindowPreviewFlagMask = 0;
+const updateWindowPreviewFlags = {
+    ICON_SHOW_OR_HIDE_WHEN_FULLSCREEN:          1 << 0,
+    ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER:         1 << 1,
+    TITLE_MOVE_TO_BOTTOM_WHEN_FULLSCREEN:       1 << 2,
+    TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER:      1 << 3,
+}
+
+Object.values(updateWindowPreviewFlags).forEach(flag => {
+    allUpdateWindowPreviewFlagMask = allUpdateWindowPreviewFlagMask | flag;
+})
+
+
 function _initializeObject() {
     _settings = ExtensionUtils.getSettings(
         'org.gnome.shell.extensions.always-show-titles-in-overview');
@@ -43,16 +56,18 @@ function _initializeObject() {
     windowTracker = Shell.WindowTracker.get_default();
 }
 
-function _hideActor(windowPreview, actor, showOrHideWhenFullscreen, showOrHideForVideoPlayer) {
-    if (showOrHideWhenFullscreen) {
-        const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
-        if (window_is_fullscreen) {
-            actor.hide();
-            return;
+function _hideOrMove(windowPreview, flags) {
+    const window_is_fullscreen = windowPreview.metaWindow.is_fullscreen()
+    if (window_is_fullscreen) {
+        if (flags & updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_WHEN_FULLSCREEN) {
+            windowPreview._icon.hide();
         }
+        _moveTitleToBottom(windowPreview, flags & updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_WHEN_FULLSCREEN);
+        return;
     }
 
-    if (showOrHideForVideoPlayer) {
+    if (flags & (updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER 
+                | updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER)) {
         const app = windowTracker.get_window_app(windowPreview.metaWindow);
         const app_info = app?.get_app_info();
         // app_info can be null if backed by a window (there's no .desktop file association)
@@ -64,7 +79,10 @@ function _hideActor(windowPreview, actor, showOrHideWhenFullscreen, showOrHideFo
             for (const category of categoriesArr) {
                 // Support Video and TV
                 if (category === 'Video' || category === 'TV') {
-                    actor.hide();
+                    if (flags & updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER) {
+                        windowPreview._icon.hide();
+                    }
+                    _moveTitleToBottom(windowPreview, flags & updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER);
                     return;
                 } 
                 
@@ -82,9 +100,27 @@ function _hideActor(windowPreview, actor, showOrHideWhenFullscreen, showOrHideFo
                 for (const supported_type of supported_types) {
                     // Support Video
                     if (supported_type.startsWith('video/')) {
-                        actor.hide();
+                        if (flags & updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER) {
+                            windowPreview._icon.hide();
+                        }
+                        _moveTitleToBottom(windowPreview, flags & updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER);
                         return;
                     }
+                }
+            }
+        }
+    }
+}
+
+function _moveTitleToBottom(windowPreview, move) {
+    if (move) {
+        const titleConstraints = windowPreview._title.get_constraints();
+        for (const constraint of titleConstraints) {
+            if (constraint instanceof Clutter.AlignConstraint) {
+                const align_axis = constraint.align_axis;
+                if (align_axis === Clutter.AlignAxis.Y_AXIS) {
+                    // 0(top), 0.5(middle), 1(bottom)
+                    constraint.set_factor(1);
                 }
             }
         }
@@ -137,10 +173,6 @@ function _updatePosition(windowPreview, constraints, position, offset) {
 }
 
 function _updateTitle(windowPreview) {
-    const showOrHideWhenFullscreen = _settings.get_boolean('do-not-show-window-title-when-fullscreen');
-    const showOrHideForVideoPlayer = _settings.get_boolean('hide-window-title-for-video-player');
-    _hideActor(windowPreview, windowPreview._title, showOrHideWhenFullscreen, showOrHideForVideoPlayer);
-
     const titleConstraints = windowPreview._title.get_constraints();
     const windowTitlePosition = _settings.get_string('window-title-position');
     _updatePosition(windowPreview, titleConstraints, windowTitlePosition, null);    
@@ -153,10 +185,6 @@ function _updateAppIcon(windowPreview) {
         windowPreview._icon.hide();
         return;
     }
-
-    const showOrHideWhenFullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
-    const showOrHideForVideoPlayer = _settings.get_boolean('hide-icon-for-video-player');
-    _hideActor(windowPreview, windowPreview._icon, showOrHideWhenFullscreen, showOrHideForVideoPlayer);
 
     const iconConstraints = windowPreview._icon.get_constraints();
     const appIconPosition = _settings.get_string('app-icon-position');
@@ -196,6 +224,16 @@ function enable() {
         _updateAppIcon(this);
         _updateTitle(this);
 
+        let flags = null;
+        const iconWhenFullscreen = _settings.get_boolean('do-not-show-app-icon-when-fullscreen');
+        const iconForVideoPlayer = _settings.get_boolean('hide-icon-for-video-player');
+        if (iconWhenFullscreen) flags |= updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_WHEN_FULLSCREEN;
+        if (iconForVideoPlayer) flags |= updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER;
+        const titleWhenFullscreen = _settings.get_boolean('move-window-title-to-bottom-when-fullscreen');
+        const titleForVideoPlayer = _settings.get_boolean('move-window-title-to-bottom-for-video-player');
+        if (titleWhenFullscreen) flags |= updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_WHEN_FULLSCREEN;
+        if (titleForVideoPlayer) flags |= updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER;
+        _hideOrMove(this, flags);
     });
 
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {

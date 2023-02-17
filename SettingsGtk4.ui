@@ -87,18 +87,18 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow" id="do_not_show_window_title_when_fullscreen_row">
+                      <object class="GtkListBoxRow">
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkGrid" id="do_not_show_window_title_when_fullscreen_grid">
+                          <object class="GtkGrid">
                             <property name="margin-top">12</property>
                             <property name="margin-bottom">12</property>
                             <property name="row-spacing">6</property>
                             <property name="column-spacing">32</property>
                             <child>
-                              <object class="GtkLabel" id="do_not_show_window_title_when_fullscreen_label">
+                              <object class="GtkLabel" id="move_window_title_to_bottom_when_fullscreen_label">
                                 <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Hide window titles when fullscreen</property>
+                                <property name="label" translatable="yes">Move the window titles to the buttom when fullscreen</property>
                                 <property name="use-markup">1</property>
                                 <property name="xalign">0</property>
                                 <layout>
@@ -108,7 +108,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkSwitch" id="do_not_show_window_title_when_fullscreen_switch">
+                              <object class="GtkSwitch" id="move_window_title_to_bottom_when_fullscreen_switch">
                                 <property name="focusable">1</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
@@ -127,18 +127,18 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBoxRow" id="hide_window_title_for_video_player_row">
+                      <object class="GtkListBoxRow">
                         <property name="focusable">1</property>
                         <property name="child">
-                          <object class="GtkGrid" id="hide_hide_window_title_for_video_player_grid">
+                          <object class="GtkGrid">
                             <property name="margin-top">12</property>
                             <property name="margin-bottom">12</property>
                             <property name="row-spacing">6</property>
                             <property name="column-spacing">32</property>
                             <child>
-                              <object class="GtkLabel" id="hide_window_title_for_video_player_label">
+                              <object class="GtkLabel" id="move_window_title_to_bottom_for_video_player_label">
                                 <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Hide window titles for video/TV players, like SMPlayer</property>
+                                <property name="label" translatable="yes">Move the window titles to the buttom for video/TV players, like SMPlayer</property>
                                 <property name="xalign">0</property>
                                 <layout>
                                   <property name="column">0</property>
@@ -147,7 +147,7 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkSwitch" id="hide_window_titles_for_video_player_switch">
+                              <object class="GtkSwitch" id="move_window_title_to_bottom_for_video_player_switch">
                                 <property name="focusable">1</property>
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
