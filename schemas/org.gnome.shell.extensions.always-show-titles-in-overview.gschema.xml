@@ -4,7 +4,40 @@
     <value value='0' nick='Bottom'/>
     <value value='1' nick='Center'/>
   </enum>
+  <enum id='org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position'>
+    <value value='0' nick='Bottom'/>
+    <value value='1' nick='Center'/>
+  </enum>
   <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
+    <key name="always-show-window-closebuttons" type="b">
+      <default>false</default>
+      <summary>Always show window close buttons in the Overview</summary>
+    </key>
+    <key name="window-title-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position">
+      <default>'Bottom'</default>
+      <summary>Window title position</summary>
+      <description>
+      Window title position, supporting 'Bottom', 'Center'. 
+      Default is 'Bottom'.
+      </description>
+    </key>
+    <key name="move-window-title-to-bottom-when-fullscreen" type="b">
+      <default>true</default>
+      <summary>Move window titles to the bottom when fullscreen</summary>
+      <description>
+      If a window is in fullscreen mode, like playing video in Firefox,
+      move the window titles to the buttom to avoid covering the 
+      playing videos in the Overview.
+      </description>
+    </key>
+    <key name="move-window-title-to-bottom-for-video-player" type="b">
+      <default>true</default>
+      <summary>Move window titles to the bottom for video/TV players, like SMPlayer</summary>
+      <description>
+      If an application is a video/TV player, like VLC, SMPlayer, 
+      move window titles to the bottom to avoid covering the videos in the Overview.
+      </description>
+    </key>
     <key name="show-app-icon" type="b">
       <default>true</default>
       <summary>Show app icons in the Overview</summary>
@@ -34,8 +67,7 @@
       <summary>Hide icons for video/TV players, like SMPlayer</summary>
       <description>
       If an application is a video/TV player, like VLC, SMPlayer, 
-      hide the app icons, which can no longer cover the video if who 
-      happens to preview videos in the Overview.
+      hide the app icons, which can no longer cover the videos in the Overview.
       </description>
     </key>
     <key name="window-active-size-inc" type="i">

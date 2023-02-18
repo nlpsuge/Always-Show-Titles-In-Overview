@@ -25,6 +25,12 @@ const Settings = GObject.registerClass({
 
     _bindSettings() {
         this._settings.bind(
+            'always-show-window-closebuttons',
+            this.window_closebutton_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind(
             'show-app-icon',
             this.show_app_icon_switch,
             'active',
@@ -45,6 +51,24 @@ const Settings = GObject.registerClass({
         this._settings.bind(
             'hide-icon-for-video-player',
             this.hide_icon_for_video_player_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        this._settings.connect('changed::window-title-position', (settings) => {
+            this._renderWindowTitlePosition();
+        });
+
+        this._settings.bind(
+            'move-window-title-to-bottom-when-fullscreen',
+            this.move_window_title_to_bottom_when_fullscreen_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+
+        this._settings.bind(
+            'move-window-title-to-bottom-for-video-player',
+            this.move_window_title_to_bottom_for_video_player_switch,
             'active',
             Gio.SettingsBindFlags.DEFAULT
         );
@@ -72,11 +96,27 @@ const Settings = GObject.registerClass({
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
         this.notebook = this._builder.get_object('settings_notebook');
 
+        this.window_closebutton_switch = this._builder.get_object('window_closebutton_switch');
+
         this.show_app_icon_switch = this._builder.get_object('show_app_icon_switch');
         this.show_app_icon_switch.connect('notify::active', (widget) => {
             const active = widget.active;
             this._settings.set_boolean('show-app-icon', active);
             this._set_sensitive_for_show_app_icon_switch(active);
+        });
+
+        this._renderWindowTitlePosition();
+
+        this.move_window_title_to_bottom_when_fullscreen_switch = this._builder.get_object('move_window_title_to_bottom_when_fullscreen_switch');
+        this.move_window_title_to_bottom_when_fullscreen_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('move-window-title-to-bottom-when-fullscreen', active);
+        });
+
+        this.move_window_title_to_bottom_for_video_player_switch = this._builder.get_object('move_window_title_to_bottom_for_video_player_switch');
+        this.move_window_title_to_bottom_for_video_player_switch.connect('notify::active', (widget) => {
+            const active = widget.active;
+            this._settings.set_boolean('move-window-title-to-bottom-for-video-player', active);
         });
 
         this._renderAppIconPosition();
@@ -136,6 +176,17 @@ const Settings = GObject.registerClass({
         }
     }
 
+    _renderWindowTitlePosition() {
+        this.window_title_position_middle_button = this._builder.get_object('window_title_position_middle_button');
+        this.window_title_position_bottom_button = this._builder.get_object('window_title_position_bottom_button');
+        this.window_title_position = this._settings.get_string('window-title-position');
+        if (this.window_title_position === 'Center') {
+            this.window_title_position_middle_button.set_active(true);
+        }
+        else {
+            this.window_title_position_bottom_button.set_active(true);
+        }
+    }
 });
 
 const BuilderScope = GObject.registerClass({
@@ -165,6 +216,14 @@ const BuilderScope = GObject.registerClass({
 
     position_middle_button_clicked_cb(button) {
         this._preferences._settings.set_string('app-icon-position', 'Center');
+    }
+
+    window_title_position_bottom_button_clicked_cb(button) {
+        this._preferences._settings.set_string('window-title-position', 'Bottom');
+    }
+
+    window_title_position_middle_button_clicked_cb(button) {
+        this._preferences._settings.set_string('window-title-position', 'Center');
     }
 });
 

@@ -13,6 +13,9 @@ const ObjectPrototype = Me.imports.utils.objectPrototype;
 const WINDOW_OVERLAY_FADE_TIME = 200;
 let _settings;
 let _objectPrototype;
+let _appsGridShownId;
+let _idleId;
+let _allWindows;
 
 function _showHideWorkspaceBackground(workspaceBackground) {
     const hide_background = _settings.get_boolean('hide-background');
@@ -42,6 +45,54 @@ function _animateFromOverview(windowPreview, animate) {
             mode: Clutter.AnimationMode.EASE_OUT_EXPO
         });
     });
+}
+
+// TODO　better to hide the titles and close buttons before entering the app grid,
+// otherwise the titles and close buttons on windows are very noticeable. 
+function _removeWindowDecorations() {
+    _appsGridShownId = Main.overview.dash.showAppsButton.connect('notify::checked', () => {
+        if (Main.overview.dash.showAppsButton.checked) {
+            _allWindows = [];
+            // Have to do this when the event loop is idle and to wait the underlying higher priority operations are completed
+            _idleId = GLib.idle_add(GLib.PRIORITY_LOW, () => {
+                // monitors
+                const workspacesViews = Main.overview._overview._controls._workspacesDisplay._workspacesViews;
+                if (workspacesViews && workspacesViews.length) {
+                    workspacesViews.forEach(wv => {
+                        const workspaces = wv._workspaces;
+                        // It's possible no workspace view bars on the second monitor
+                        if (workspaces && workspaces.length) {
+                            workspaces.forEach(workspace => {
+                                const windows = workspace._windows;
+                                if (windows.length) {
+                                    windows.forEach(windowPreview => {
+                                        windowPreview._closeButton._originalVisibleAWSM = windowPreview._closeButton.visible;
+                                        windowPreview._title._originalVisibleAWSM = windowPreview._title.visible;
+                                        windowPreview._closeButton.hide();
+                                        windowPreview._title.hide();
+                                        _allWindows.push(windowPreview);
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+                return GLib.SOURCE_REMOVE;
+            });
+        } else {
+            _restoreWindowsVisible();
+        }
+    });
+}
+
+function _restoreWindowsVisible() {
+    if (_allWindows && _allWindows.length) {
+        _allWindows.forEach(windowPreview => {
+            windowPreview._closeButton.visible = windowPreview._closeButton._originalVisibleAWSM;
+            windowPreview._title.visible = windowPreview._title._originalVisibleAWSM;
+        });
+        _allWindows = null;
+    }
 }
 
 var CustomWorkspace = class {
@@ -82,6 +133,18 @@ var CustomWorkspace = class {
             _objectPrototype.removeInjections(Workspace.Workspace.prototype);
             _objectPrototype = null;
         }
+
+        if (_appsGridShownId) {
+            Main.overview.dash.showAppsButton.disconnect(_appsGridShownId);
+            _appsGridShownId = null;
+        }
+
+        if (_idleId) {
+            GLib.source_remove(_idleId);
+            _idleId = null;
+        }
+
+        _restoreWindowsVisible();
     }
 
 }
