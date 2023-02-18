@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, St, GObject, GLib } = imports.gi;
+const { Clutter, St, GObject } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const WorkspacesView = imports.ui.workspacesView;
@@ -98,7 +98,7 @@ function _restoreWindowsVisible() {
 var CustomWorkspace = class {
 
     constructor() {
-        _removeWindowDecorations();
+
     }
 
     enable() {
