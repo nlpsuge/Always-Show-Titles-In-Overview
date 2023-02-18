@@ -15,6 +15,51 @@
             <!-- GtkBox: Sets the “spacing” property of box , which is the number of pixels to place between children of box . -->
             <property name="spacing">24</property>
             <child>
+              <object class="GtkFrame" id="window_closebutton_frame">
+                <property name="child">
+                  <object class="GtkListBox" id="window_closebutton_multimon_listbox">
+                    <property name="selection_mode">none</property>
+                    <child>
+                      <object class="GtkListBoxRow" id="window_closebutton_multi_row">
+                        <property name="focusable">1</property>
+                        <property name="child">
+                          <object class="GtkGrid" id="window_closebutton_multi_grid">
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <property name="row-spacing">6</property>
+                            <property name="column-spacing">32</property>
+                            <child>
+                              <object class="GtkLabel" id="window_closebutton_multi_label">
+                                <property name="hexpand">1</property>
+                                <property name="label" translatable="yes">Always show window close buttons</property>
+                                <property name="use-markup">1</property>
+                                <property name="xalign">0</property>
+                                <layout>
+                                  <property name="column">0</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="window_closebutton_switch">
+                                <property name="focusable">1</property>
+                                <property name="halign">end</property>
+                                <property name="valign">center</property>
+                                <layout>
+                                  <property name="column">1</property>
+                                  <property name="row">0</property>
+                                </layout>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
               <object class="GtkFrame" id="window_title_frame">
                 <property name="child">
                   <object class="GtkListBox" id="show_window_title_multimon_listbox">

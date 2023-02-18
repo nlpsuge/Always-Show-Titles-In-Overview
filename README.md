@@ -15,16 +15,19 @@ Please read this post([Gnome 3.26: How to get the window titles in the activitie
 and this comment below [Gnome Bugzilla - Window picker layout improvements](https://bugzilla.gnome.org/show_bug.cgi?id=783953).
 
 # Features
-|Feature name|Default|
-|------------|-------|
-| Always show titles of all window thumbnails | - |
-| Always show close buttons of all window thumbnails | - |
-| Show app icons | on |
-| App icon position (Bottom, Center) | Bottom |
-| Hide icons when fullscreen | on |
-| Hide icons for Video/TV players, like SMPlayer | on |
-| Tweak the window thumbnail active size increment (from 5 to 60) | 15 |
-| Hide the background | off |
+| Features                                                             | Default Setting |
+|----------------------------------------------------------------------|-----------------|
+| Always show titles of all window thumbnails                          | -               |
+| Always show close buttons of all window thumbnails                   | off             |
+| Window titles position (Bottom, Center)                              | Bottom          |
+| Move window titles to the bottom when fullscreen                     | on              |
+| Move window titles to the bottom for video/TV players, like SMPlayer | on              |
+| Show app icons                                                       | on              |
+| App icon position (Bottom, Center)                                   | Bottom          |
+| Hide icons when fullscreen                                           | on              |
+| Hide icons for Video/TV players, like SMPlayer                       | on              |
+| Tweak the window thumbnail active size increment (from 5 to 60)      | 15              |
+| Hide the background                                                  | off             |
 
 # Settings
 This extension has a Settings now, which makes it more useful:

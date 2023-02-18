@@ -23,7 +23,7 @@ const ObjectPrototype = Me.imports.utils.objectPrototype;
 
 let windowOverlayInjections;
 
-var WINDOW_SCALE_TIME = 200;
+let _alwaysShowWindowClosebuttons = true;
 
 let _settings = null;
 let customWorkspace;
@@ -200,13 +200,12 @@ function enable() {
     // WindowPreview._init () is called N times if there are N windows when activate the Overview
     // Always show titles and close buttons
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_init', true, function(animate) {
-        const toShow = this._windowCanClose()
-            ? [this._title, this._closeButton]
-            : [this._title];
+        
+        if (this._windowCanClose() && _settings.get_boolean('always-show-window-closebuttons')) {
+            this._closeButton.show();
+        }
 
-        toShow.forEach(a => {
-            a.show();
-        });
+        this._title.show();
 
         // titles
 
@@ -260,6 +259,21 @@ function enable() {
             ongoingTransition.get_interval().peek_final_value() === 255)
             return;
 
+        _alwaysShowWindowClosebuttons = _settings.get_boolean('always-show-window-closebuttons');
+        if (!_alwaysShowWindowClosebuttons) {
+            const toShow = this._windowCanClose() ? [this._closeButton] : [];
+
+            toShow.forEach(a => {
+                a.opacity = 0;
+                a.show();
+                a.ease({
+                    opacity: 255,
+                    duration: animate ? WindowPreview.WINDOW_OVERLAY_FADE_TIME : 0,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                });
+            });
+        }
+        
         const [width, height] = this.window_container.get_size();
         const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
         const window_active_size_inc = _settings.get_int('window-active-size-inc');
@@ -271,7 +285,7 @@ function enable() {
         this.window_container.ease({
             scale_x: scale,
             scale_y: scale,
-            duration: animate ? WINDOW_SCALE_TIME : 0,
+            duration: animate ? WindowPreview.WINDOW_SCALE_TIME : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
 
@@ -295,10 +309,23 @@ function enable() {
             ongoingTransition.get_interval().peek_final_value() === 0)
             return;
 
+
+        if (!_alwaysShowWindowClosebuttons) {
+            [this._closeButton].forEach(a => {
+                a.opacity = 255;
+                a.ease({
+                    opacity: 0,
+                    duration: animate ? WindowPreview.WINDOW_OVERLAY_FADE_TIME : 0,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                    onComplete: () => a.hide(),
+                });
+            });   
+        }
+        
         this.window_container.ease({
             scale_x: 1,
             scale_y: 1,
-            duration: animate ? WINDOW_SCALE_TIME : 0,
+            duration: animate ? WindowPreview.WINDOW_SCALE_TIME : 0,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
     });

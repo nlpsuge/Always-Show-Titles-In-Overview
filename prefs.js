@@ -25,6 +25,12 @@ const Settings = GObject.registerClass({
 
     _bindSettings() {
         this._settings.bind(
+            'always-show-window-closebuttons',
+            this.window_closebutton_switch,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+        this._settings.bind(
             'show-app-icon',
             this.show_app_icon_switch,
             'active',
@@ -89,6 +95,8 @@ const Settings = GObject.registerClass({
         this._builder.set_scope(new BuilderScope(this));
         this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
         this.notebook = this._builder.get_object('settings_notebook');
+
+        this.window_closebutton_switch = this._builder.get_object('window_closebutton_switch');
 
         this.show_app_icon_switch = this._builder.get_object('show_app_icon_switch');
         this.show_app_icon_switch.connect('notify::active', (widget) => {

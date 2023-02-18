@@ -9,7 +9,11 @@
     <value value='1' nick='Center'/>
   </enum>
   <schema id="org.gnome.shell.extensions.always-show-titles-in-overview" path="/org/gnome/shell/extensions/always-show-titles-in-overview/">
-  <key name="window-title-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position">
+    <key name="always-show-window-closebuttons" type="b">
+      <default>false</default>
+      <summary>Always show window close buttons in the Overview</summary>
+    </key>
+    <key name="window-title-position" enum="org.gnome.shell.extensions.always-show-titles-in-overview.window-title-position">
       <default>'Bottom'</default>
       <summary>Window title position</summary>
       <description>
