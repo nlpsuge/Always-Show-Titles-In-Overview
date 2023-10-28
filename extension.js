@@ -30,6 +30,8 @@ let customWorkspace;
 let _objectPrototype; 
 let windowTracker;
 let _idleId;
+let _mpris;
+
 
 let allUpdateWindowPreviewFlagMask = 0;
 const updateWindowPreviewFlags = {
@@ -233,6 +235,8 @@ function enable() {
         if (titleWhenFullscreen) flags |= updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_WHEN_FULLSCREEN;
         if (titleForVideoPlayer) flags |= updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER;
         _hideOrMove(this, flags);
+
+        _mpris = new Mpris();
     });
 
     _objectPrototype.injectOrOverrideFunction(WindowPreview.WindowPreview.prototype, '_adjustOverlayOffsets', true, function() {
