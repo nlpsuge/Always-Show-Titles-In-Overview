@@ -1,14 +1,10 @@
-'use strict';
+import GLib from 'gi://GLib';
+import Clutter from 'gi://Clutter';
 
-const { Clutter, St, GObject, GLib } = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const WorkspacesView = imports.ui.workspacesView;
-const Main = imports.ui.main;
-const Overview = imports.ui.overview;
-const Workspace = imports.ui.workspace;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Workspace from 'resource:///org/gnome/shell/ui/workspace.js';
 
-const ObjectPrototype = Me.imports.utils.objectPrototype;
+import * as ObjectPrototype from './utils/objectPrototype.js';
 
 const WINDOW_OVERLAY_FADE_TIME = 200;
 let _settings;
@@ -95,14 +91,15 @@ function _restoreWindowsVisible() {
     }
 }
 
-var CustomWorkspace = class {
+export const CustomWorkspace = class {
 
-    constructor() {
+    constructor(extensionObject) {
         _removeWindowDecorations();
+        this.extensionObject = extensionObject;
     }
 
     enable() {
-        _settings = ExtensionUtils.getSettings(
+        _settings = this.extensionObject.getSettings(
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         _objectPrototype = new ObjectPrototype.ObjectPrototype();
 

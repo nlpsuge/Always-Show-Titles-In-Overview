@@ -1,18 +1,19 @@
-'use strict';
+import GObject from 'gi://GObject';
+import Gio from 'gi://Gio';
+import Gtk from 'gi://Gtk';
 
-const { Gtk, GObject, Gio } = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 15, 25, 35, 45, 55, 60];
 
 const Settings = GObject.registerClass({
     GTypeName: 'AlwaysShowTitlesInOverviewSettings',
 }, class Settings extends Gtk.Notebook {
-    _init() {
+    _init(extensionPreferences) {
         super._init();
-
-        this._settings = ExtensionUtils.getSettings(
+        this.extensionPreferences = extensionPreferences;
+        this._settings = this.extensionPreferences.getSettings(
             'org.gnome.shell.extensions.always-show-titles-in-overview');
         this._renderUi();
         this._bindSettings();
@@ -93,8 +94,7 @@ const Settings = GObject.registerClass({
     _renderUi() {
         this._builder = new Gtk.Builder();
         this._builder.set_scope(new BuilderScope(this));
-        this._builder.add_from_file(Me.path + '/SettingsGtk4.ui');
-        this.notebook = this._builder.get_object('settings_notebook');
+        this._builder.add_from_file(this.extensionPreferences.path + '/SettingsGtk4.ui');
 
         this.window_closebutton_switch = this._builder.get_object('window_closebutton_switch');
 
@@ -227,12 +227,11 @@ const BuilderScope = GObject.registerClass({
     }
 });
 
-function buildPrefsWidget() {
-    let settings = new Settings();
-    let notebook = settings.notebook;
-    return notebook;
+export default class MyExtensionPreferences extends ExtensionPreferences {
+    fillPreferencesWindow(window) {
+        const settings = new Settings(this);
+        const settings_page = settings._builder.get_object('settings_page');
+        window.add(settings_page)
+    }
 }
 
-function init() {
-
-}

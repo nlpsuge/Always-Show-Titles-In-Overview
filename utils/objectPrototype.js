@@ -1,8 +1,6 @@
-'use strict';
-
 /* exported ObjectPrototype */
 
-var ObjectPrototype = class ObjectPrototype {
+export const ObjectPrototype = class ObjectPrototype {
     
     constructor() {
         this.injections = {};
