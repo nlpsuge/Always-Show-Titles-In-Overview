@@ -227,7 +227,7 @@ const BuilderScope = GObject.registerClass({
     }
 });
 
-export default class MyExtensionPreferences extends ExtensionPreferences {
+export default class AlwaysShowTitlesInOverviewExtensionPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = new Settings(this);
         const settings_page = settings._builder.get_object('settings_page');

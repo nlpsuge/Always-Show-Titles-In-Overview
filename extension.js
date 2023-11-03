@@ -49,7 +49,7 @@ function _initializeObject(extensionObject) {
     _settings = extensionObject.getSettings(
         'org.gnome.shell.extensions.always-show-titles-in-overview');
 
-    customWorkspace = new CustomWorkspace(extensionObject);
+    customWorkspace = new CustomWorkspace(_settings);
     customWorkspace.enable();
 
     _objectPrototype = new ObjectPrototype.ObjectPrototype();
@@ -195,7 +195,7 @@ function _updateAppIcon(windowPreview) {
     _updatePosition(windowPreview, iconConstraints, appIconPosition, offset);
 }
 
-export default class AlwaysShowTitlesInOverview extends Extension {
+export default class AlwaysShowTitlesInOverviewExtension extends Extension {
 
     enable() {
         _initializeObject(this);
@@ -339,8 +339,6 @@ export default class AlwaysShowTitlesInOverview extends Extension {
     disable() {
         // Destroy the created object
         if (_settings) {
-            // GObject.Object.run_dispose(): Releases all references to other objects.
-            _settings.run_dispose();
             _settings = null;
         }
 
