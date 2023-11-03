@@ -29,6 +29,14 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 | Tweak the window thumbnail active size increment (from 5 to 60)      | 15              |
 | Hide the background                                                  | off             |
 
+# Gnome versions
+
+| Gnome version   | Branch          | Is default branch? |
+|-----------------|-----------------|--------------------|
+| Gnome 40 to 44  |  [gnome-40-44](https://github.com/nlpsuge/Always-Show-Titles-In-Overview/tree/gnome-40-44)  | No  |
+| Gnome 45+       |  [gnome-45+](https://github.com/nlpsuge/Always-Show-Titles-In-Overview/tree/gnome-45+)      | Yes |
+
+
 # Settings
 This extension has a Settings now, which makes it more useful:
 
