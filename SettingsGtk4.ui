@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <object class="AdwPreferencesPage" id="settings_page">
-    <!-- <property name="icon-name">text-x-generic-symbolic</property> -->
-    <!-- <property name="use_underline">true</property> -->
-    <!-- <property name="title" translatable="yes">Close windows</property> -->
     <child>
       <object class="GtkScrolledWindow">
         <property name="hscrollbar_policy">Always</property>
