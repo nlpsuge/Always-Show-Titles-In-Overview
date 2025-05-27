@@ -2,7 +2,7 @@ import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
-import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/shell/extensions/prefs.js';
 
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 15, 25, 35, 45, 55, 60];

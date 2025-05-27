@@ -4,9 +4,11 @@
   "name": "Always Show Titles In Overview",
   "shell-version": [
     "45",
-    "46"
+    "46",
+    "47",
+    "48"
   ],
   "url": "https://github.com/nlpsuge/Always-Show-Titles-In-Overview",
   "uuid": "Always-Show-Titles-In-Overview@gmail.com",
-  "version": 26
+  "version": 27
 }
