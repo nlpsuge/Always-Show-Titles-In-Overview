@@ -6,6 +6,7 @@ import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Ex
 
 
 const DEFAULT_WINDOW_ACTIVE_SIZE_INC_RANGE = [5, 15, 25, 35, 45, 55, 60];
+const DEFAULT_TITLE_FONT_SIZE_RANGE = [0, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32];
 
 const Settings = GObject.registerClass({
     GTypeName: 'AlwaysShowTitlesInOverviewSettings',
@@ -82,6 +83,12 @@ const Settings = GObject.registerClass({
             this.window_active_size_inc_scale.set_value(window_active_size_inc_scale);
         });
 
+        // Listen changes of title-font-size, pass the changed value to GtkScale
+        this._settings.connect('changed::title-font-size', (settings) => {
+            const title_font_size = settings.get_int('title-font-size');
+            this.title_font_size_scale.set_value(title_font_size);
+        });
+
         this._settings.bind(
             'hide-background',
             this.hide_background_switch,
@@ -106,6 +113,27 @@ const Settings = GObject.registerClass({
         });
 
         this._renderWindowTitlePosition();
+
+        // Title font size slider
+        this.title_font_size_scale = this._builder.get_object('title_font_size_scale');
+        this.title_font_size_scale.set_format_value_func((scale, value) => {
+            return value === 0 ? 'default' : value + ' pt';
+        });
+
+        let fontMin = DEFAULT_TITLE_FONT_SIZE_RANGE[0];
+        let fontMax = DEFAULT_TITLE_FONT_SIZE_RANGE[DEFAULT_TITLE_FONT_SIZE_RANGE.length - 1];
+        this.title_font_size_scale.set_range(fontMin, fontMax);
+        this.title_font_size_scale.set_value(
+            this._settings.get_int('title-font-size'));
+        DEFAULT_TITLE_FONT_SIZE_RANGE.slice().forEach(num => {
+            this.title_font_size_scale.add_mark(num, Gtk.PositionType.TOP, null);
+        });
+
+        // Listen changes of title_font_size_scale, pass the changed value to Gio.Gsettings
+        this.title_font_size_scale.connect('value-changed', (scale) => {
+            const value = scale.get_value();
+            this._settings.set_int('title-font-size', value);
+        });
 
         this.move_window_title_to_bottom_when_fullscreen_switch = this._builder.get_object('move_window_title_to_bottom_when_fullscreen_switch');
         this.move_window_title_to_bottom_when_fullscreen_switch.connect('notify::active', (widget) => {
