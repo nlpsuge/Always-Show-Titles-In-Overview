@@ -28,6 +28,7 @@ and this comment below [Gnome Bugzilla - Window picker layout improvements](http
 | Hide icons for Video/TV players, like SMPlayer                       | on              |
 | Tweak the window thumbnail active size increment (from 5 to 60)      | 15              |
 | Hide the background                                                  | off             |
+| Customize the font size of window titles | 0 (system default) | 
 
 # Gnome versions
 

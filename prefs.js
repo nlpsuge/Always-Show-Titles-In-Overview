@@ -117,7 +117,7 @@ const Settings = GObject.registerClass({
         // Title font size slider
         this.title_font_size_scale = this._builder.get_object('title_font_size_scale');
         this.title_font_size_scale.set_format_value_func((scale, value) => {
-            return value === 0 ? 'default' : value + ' pt';
+            return value === 0 ? 'default' : value + ' px';
         });
 
         let fontMin = DEFAULT_TITLE_FONT_SIZE_RANGE[0];
@@ -126,7 +126,7 @@ const Settings = GObject.registerClass({
         this.title_font_size_scale.set_value(
             this._settings.get_int('title-font-size'));
         DEFAULT_TITLE_FONT_SIZE_RANGE.slice().forEach(num => {
-            this.title_font_size_scale.add_mark(num, Gtk.PositionType.TOP, null);
+            this.title_font_size_scale.add_mark(num, Gtk.PositionType.TOP, num.toString());
         });
 
         // Listen changes of title_font_size_scale, pass the changed value to Gio.Gsettings
