@@ -86,5 +86,14 @@
       Whether hide the background in the Overview or not.
       </description>
     </key>
+    <key name="title-font-size" type="i">
+      <default>0</default>
+      <summary>Window title font size in points (0 = use default)</summary>
+      <description>
+      Custom font size for window titles in the Overview.
+      Set to 0 to use the default system font size.
+      Recommended range: 10-24.
+      </description>
+    </key>
   </schema>
 </schemalist>

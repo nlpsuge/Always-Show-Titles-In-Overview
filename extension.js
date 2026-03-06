@@ -210,6 +210,12 @@ export default class AlwaysShowTitlesInOverviewExtension extends Extension {
 
             this._title.show();
 
+            // Apply custom font size if set
+            const fontSize = _settings.get_int('title-font-size');
+            if (fontSize > 0) {
+                this._title.set_style(`font-size: ${fontSize}pt;`);
+            }
+
             // titles
 
             // Remove title offset to avoid being covered by another window
