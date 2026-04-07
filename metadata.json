@@ -9,6 +9,9 @@
     "48",
     "49"
   ],
+  "donations": {
+        "github": "nlpsuge"
+  },
   "url": "https://github.com/nlpsuge/Always-Show-Titles-In-Overview",
   "uuid": "Always-Show-Titles-In-Overview@gmail.com",
   "version": 27
