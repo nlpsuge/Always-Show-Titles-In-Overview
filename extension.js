@@ -31,6 +31,7 @@ let customWorkspace;
 let _objectPrototype; 
 let windowTracker;
 let _idleId;
+let GioUnix = null;
 
 let allUpdateWindowPreviewFlagMask = 0;
 const updateWindowPreviewFlags = {
@@ -55,6 +56,13 @@ function _initializeObject(extensionObject) {
     _objectPrototype = new ObjectPrototype.ObjectPrototype();
 
     windowTracker = Shell.WindowTracker.get_default();
+
+    try {
+        GioUnix = imports.gi.GioUnix;
+    } catch {
+        // GioUnix-2.0 is not separately available on older supported GLib.
+        GioUnix = null;
+    }
 }
 
 function _hideOrMove(windowPreview, flags) {
@@ -70,11 +78,14 @@ function _hideOrMove(windowPreview, flags) {
     if (flags & (updateWindowPreviewFlags.ICON_SHOW_OR_HIDE_FOR_VIDEO_PLAYER 
                 | updateWindowPreviewFlags.TITLE_MOVE_TO_BOTTOM_FOR_VIDEO_PLAYER)) {
         const app = windowTracker.get_window_app(windowPreview.metaWindow);
-        const app_info = app?.get_app_info();
-        // app_info can be null if backed by a window (there's no .desktop file association)
+        const appId = app?.get_id();
+        // desktopInfo can be null if backed by a window (there's no .desktop file association)
         // See: shell_app_is_window_backed()
+        const desktopInfo = appId && GioUnix
+            ? GioUnix.DesktopAppInfo.new(appId)
+            : app?.get_app_info();
         let recheck = false;
-        const categories = app_info?.get_categories();
+        const categories = desktopInfo?.get_categories();
         if (categories) {
             const categoriesArr = categories.split(';')
             for (const category of categoriesArr) {
@@ -95,8 +106,8 @@ function _hideOrMove(windowPreview, flags) {
         }
 
         if (recheck) {
-            log('Rechecking whether ' + app_info?.get_name() + ' is a video player or not by checking mime type');
-            const supported_types = app_info?.get_supported_types();
+            log('Rechecking whether ' + desktopInfo?.get_name() + ' is a video player or not by checking mime type');
+            const supported_types = desktopInfo?.get_supported_types();
             if (supported_types) {
                 for (const supported_type of supported_types) {
                     // Support Video
@@ -366,6 +377,8 @@ export default class AlwaysShowTitlesInOverviewExtension extends Extension {
             GLib.source_remove(_idleId);
             _idleId = null;
         }
+
+        GioUnix = null;
 
     }
 }
