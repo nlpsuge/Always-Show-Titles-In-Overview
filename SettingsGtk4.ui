@@ -2,9 +2,7 @@
 <interface>
   <object class="AdwPreferencesPage" id="settings_page">
     <child>
-      <object class="GtkScrolledWindow">
-        <property name="hscrollbar_policy">always</property>
-        <property name="vscrollbar_policy">always</property>
+      <object class="AdwPreferencesGroup">
         <child>
           <object class="GtkViewport">
             <property name="focusable">False</property>
