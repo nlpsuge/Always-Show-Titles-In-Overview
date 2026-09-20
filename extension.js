@@ -31,7 +31,15 @@ let customWorkspace;
 let _objectPrototype; 
 let windowTracker;
 let _idleId;
+
 let GioUnix = null;
+try {
+    // Load GioUnix
+    ({default:GioUnix} = await import('gi://GioUnix'));
+} catch {
+    // GioUnix-2.0 is not separately available on older supported GLib.
+    GioUnix = null;
+}
 
 let allUpdateWindowPreviewFlagMask = 0;
 const updateWindowPreviewFlags = {
@@ -57,12 +65,6 @@ function _initializeObject(extensionObject) {
 
     windowTracker = Shell.WindowTracker.get_default();
 
-    try {
-        GioUnix = imports.gi.GioUnix;
-    } catch {
-        // GioUnix-2.0 is not separately available on older supported GLib.
-        GioUnix = null;
-    }
 }
 
 function _hideOrMove(windowPreview, flags) {
